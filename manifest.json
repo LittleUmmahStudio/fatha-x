@@ -1,7 +1,7 @@
 {
   "name": "Fatha-X: Eksplorasi Huruf",
   "short_name": "Fatha-X",
-  "start_url": "./",
+  "start_url": "/fatha-x/",
   "display": "standalone",
   "background_color": "#FFE5F1",
   "theme_color": "#FF6B6B",
