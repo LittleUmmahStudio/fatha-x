@@ -1,0 +1,2991 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 Fatha-X: Eksplorasi Huruf & Bunyi Fathah</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pastel-green': '#C8E6C9',
+                        'pastel-blue': '#BBDEFB',
+                        'pastel-orange': '#FFE0B2',
+                        'pastel-pink': '#F8BBD0',
+                        'pastel-yellow': '#FFF9C4',
+                        'button-green': '#AED581',
+                        'progress-yellow': '#FFD54F'
+                    }
+                }
+            }
+        }
+    </script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAZOCQ06W3mCF51AgS5hxQXoWwizFpa_m8",
+            authDomain: "fathax-app.firebaseapp.com",
+            projectId: "fathax-app",
+            storageBucket: "fathax-app.firebasestorage.app",
+            messagingSenderId: "152665643433",
+            appId: "1:152665643433:web:a5bd5f3d173c89388f8cb8"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // Make Firebase functions available globally
+        window.saveToFirebase = async function(data) {
+            try {
+                const docRef = await addDoc(collection(db, "markah_fathax"), data);
+                console.log("Document written with ID: ", docRef.id);
+                return true;
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                return false;
+            }
+        };
+        
+        window.getLeaderboardData = async function() {
+            try {
+                const { getDocs, query, orderBy, limit } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                const q = query(collection(db, "markah_fathax"), orderBy("markah", "desc"), limit(10));
+                const querySnapshot = await getDocs(q);
+                
+                const leaderboardData = [];
+                querySnapshot.forEach((doc) => {
+                    leaderboardData.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                return leaderboardData;
+            } catch (e) {
+                console.error("Error getting leaderboard data: ", e);
+                throw e;
+            }
+        };
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #FFE5F1 0%, #E8F5E8 25%, #FFF8DC 50%, #E1F5FE 75%, #F3E5F5 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            font-size: 18px;
+            text-align: center;
+            min-height: 100vh;
+            padding-bottom: 60px; /* Space for fixed footer */
+            overflow-x: hidden; /* Prevent horizontal scroll on mobile */
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .arabic-text {
+            font-family: 'Amiri', 'Arial Unicode MS', 'Tahoma', sans-serif;
+            font-weight: bold;
+            color: #FF6B6B;
+            direction: rtl;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .rumi-text {
+            direction: ltr;
+            text-align: center;
+            color: #4ECDC4;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .islamic-pattern {
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(139, 195, 74, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(33, 150, 243, 0.1) 0%, transparent 50%);
+        }
+        
+        .phase-card {
+            transition: all 0.4s ease;
+            background: linear-gradient(135deg, #B2DFDB 0%, #81C784 100%);
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .phase-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(139, 195, 74, 0.4);
+            border-color: #FFD700;
+        }
+        
+        .activity-btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .activity-btn:hover {
+            transform: scale(1.05) rotate(1deg);
+            animation: buttonBounce 0.6s ease;
+        }
+        
+        @keyframes buttonBounce {
+            0%, 100% { transform: scale(1.05) rotate(1deg); }
+            50% { transform: scale(1.08) rotate(-1deg); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .bounce {
+            animation: bounce 0.6s ease;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .sparkle {
+            animation: sparkle 2s ease-in-out infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1) translateY(0px); opacity: 1; }
+            50% { transform: scale(1.2) translateY(-5px); opacity: 0.8; }
+        }
+        
+        .wiggle {
+            animation: wiggle 3s ease-in-out infinite;
+        }
+        
+        @keyframes wiggle {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        .rainbow-text {
+            background: linear-gradient(45deg, #d63031, #00b894, #0984e3, #6c5ce7, #fdcb6e, #e84393);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: rainbow 3s ease infinite;
+        }
+        
+        /* Drag & Drop Styles */
+        .draggable-letter {
+            background: #FFF2D8;
+            border: 2px solid #E8D5B7;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .drop-target {
+            background: #D6E5FA;
+            border: 3px dashed #B3D4FC;
+            transition: all 0.3s ease;
+        }
+        
+        .drop-success {
+            background: #C8E6C9 !important;
+            border: 3px solid #4CAF50 !important;
+            animation: dropSuccess 0.5s ease;
+        }
+        
+        @keyframes dropSuccess {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Card Matching Styles */
+        .card {
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            perspective: 1000px;
+        }
+        
+        .card-flip {
+            animation: cardFlip 0.6s ease-in-out;
+        }
+        
+        @keyframes cardFlip {
+            0% { transform: rotateY(0deg); }
+            50% { transform: rotateY(90deg); }
+            100% { transform: rotateY(0deg); }
+        }
+        
+        .card-matched {
+            background: #FFF9E6 !important;
+            border: 2px solid #FFD700 !important;
+            animation: cardMatch 0.8s ease;
+        }
+        
+        @keyframes cardMatch {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .answer-correct {
+            background: #C8E6C9 !important;
+            border: 2px solid #4CAF50 !important;
+            animation: correctAnswer 0.6s ease;
+        }
+        
+        .answer-wrong {
+            background: #FFCDD2 !important;
+            border: 2px solid #F44336 !important;
+            animation: wrongAnswer 0.6s ease;
+        }
+        
+        @keyframes correctAnswer {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes wrongAnswer {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .timer-display {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            animation: timerPulse 1s ease-in-out infinite;
+        }
+        
+        @keyframes timerPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .timer-warning {
+            color: #FF5722 !important;
+            animation: timerWarning 0.5s ease-in-out infinite alternate;
+        }
+        
+        @keyframes timerWarning {
+            0% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
+        /* Certificate Styles */
+        .certificate-frame {
+            background: linear-gradient(135deg, #FFF8DC 0%, #F0E68C 100%);
+            border: 8px solid #DAA520;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .certificate-frame::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FFD700);
+            border-radius: 24px;
+            z-index: -1;
+        }
+        
+    </style>
+</head>
+<body class="islamic-pattern min-h-screen">
+    <div class="bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-300 shadow-xl border-b-4 border-yellow-400">
+        <div class="container mx-auto px-4 py-6 md:py-8 text-center relative overflow-hidden">
+            <div class="absolute top-2 left-4 md:left-10 text-xl md:text-3xl sparkle">🌟</div>
+            <div class="absolute top-4 right-8 md:right-16 text-lg md:text-2xl floating" style="animation-delay: 1s;">⭐</div>
+            <div class="absolute bottom-2 left-10 md:left-20 text-lg md:text-2xl wiggle" style="animation-delay: 2s;">✨</div>
+            <div class="absolute bottom-4 right-4 md:right-10 text-xl md:text-3xl sparkle" style="animation-delay: 0.5s;">🌙</div>
+            
+            <div class="text-center">
+                <h1 class="text-2xl md:text-4xl font-bold mb-2 md:mb-3 rainbow-text">
+                    Siri Hijaiyyah Pintar
+                </h1>
+                <h2 class="text-lg md:text-2xl font-bold mb-3 md:mb-4 rainbow-text">
+                    Eksplorasi Huruf & Bunyi Fathah
+                </h2>
+            </div>
+            <div class="bg-white/80 rounded-full px-4 md:px-6 py-1 md:py-2 inline-block shadow-md border-2 border-yellow-300">
+                <p class="text-purple-800 text-sm md:text-xl font-bold wiggle">📖 Rujukan: Iqra 1 KPM 📚</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 pb-8">
+        <div id="frontPage" class="fade-in">
+            <div class="max-w-4xl mx-auto text-center px-2 py-6 md:py-8">
+                <div class="mb-8 md:mb-12 relative">
+                    <div class="absolute -top-10 -left-10 text-6xl sparkle opacity-30 hidden md:block">🌟</div>
+                    <div class="absolute top-15 -right-10 text-6xl sparkle opacity-40 hidden md:block" style="animation-delay: 0.5s;">🌙</div>
+                    
+                    <div class="text-7xl md:text-9xl mb-4 md:mb-8 floating relative z-10">
+                        <span class="rainbow-text">🌙</span>
+                    </div>
+                    <div class="bg-gradient-to-r from-pink-200 to-purple-200 rounded-3xl p-6 md:p-8 shadow-2xl border-4 border-yellow-300 relative z-10">
+                        <h1 class="text-5xl md:text-7xl font-bold mb-4 md:mb-6 rainbow-text wiggle">
+                            Fatha-X
+                        </h1>
+                        <h2 class="text-2xl md:text-4xl mb-4 md:mb-6 text-purple-800 font-bold sparkle">
+                            Eksplorasi Huruf & Bunyi Fathah
+                        </h2>
+                        <div class="bg-white/90 rounded-full px-4 py-3 md:px-8 md:py-4 inline-block shadow-lg border-2 border-pink-300 w-full md:w-auto">
+                            <p class="text-lg md:text-2xl text-pink-600 font-bold whitespace-normal">
+                                <span class="sparkle">✨</span> Pembelajaran Iqra' 1 yang Menyeronokkan <span class="sparkle">✨</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 mb-10 md:mb-12">
+                    <div class="text-center bg-gradient-to-br from-yellow-200 to-orange-200 rounded-3xl p-6 shadow-xl border-4 border-yellow-400 phase-card">
+                        <div class="text-5xl md:text-6xl mb-4 sparkle">✨</div>
+                        <p class="font-bold text-xl md:text-2xl text-orange-800 mb-2 wiggle">Mudah</p>
+                        <p class="text-orange-700 text-base md:text-lg font-semibold">mesra pengguna</p>
+                    </div>
+                    <div class="text-center bg-gradient-to-br from-green-200 to-teal-200 rounded-3xl p-6 shadow-xl border-4 border-green-400 phase-card" style="animation-delay: 0.5s;">
+                        <div class="text-5xl md:text-6xl mb-4 floating text-green-600" style="animation-delay: 1s;">📖</div>
+                        <p class="font-bold text-xl md:text-2xl text-teal-800 mb-2 wiggle">Interaktif</p>
+                        <p class="text-teal-700 text-base md:text-lg font-semibold">Pembelajaran hands-on</p>
+                    </div>
+                    <div class="text-center bg-gradient-to-br from-purple-200 to-pink-200 rounded-3xl p-6 shadow-xl border-4 border-purple-400 phase-card sm:col-span-2 md:col-span-1" style="animation-delay: 1s;">
+                        <div class="text-5xl md:text-6xl mb-4 sparkle" style="animation-delay: 2s;">🎯</div>
+                        <p class="font-bold text-xl md:text-2xl text-purple-800 mb-2 wiggle">Seronok</p>
+                        <p class="text-purple-700 text-base md:text-lg font-semibold">gamifikasi pembelajaran</p>
+                    </div>
+                </div>
+                
+                <div class="relative inline-block w-full md:w-auto px-4 md:px-0">
+                    <button onclick="showRegistration()" class="w-full md:w-auto bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white px-8 py-4 md:px-20 md:py-8 rounded-full text-xl md:text-3xl font-bold transition-all shadow-xl border-4 border-white activity-btn relative z-10">
+                        <span class="sparkle">📘</span> Mula Belajar <span class="wiggle">➜</span>
+                    </button>
+                    <div class="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 rounded-full blur-xl opacity-30 animate-pulse hidden md:block"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="registrationPage" class="hidden fade-in">
+            <div class="max-w-2xl mx-auto px-2 py-4 md:py-8">
+                <div class="bg-gradient-to-br from-pink-100 to-purple-100 p-6 md:p-10 mb-8 rounded-3xl shadow-xl border-4 border-pink-300 relative overflow-hidden">
+                    
+                    <div class="text-center mb-8 relative z-10">
+                        <div class="text-6xl md:text-8xl mb-4 rainbow-text floating">📝</div>
+                        <div class="bg-white/90 rounded-full px-6 py-3 inline-block shadow-lg border-3 border-yellow-400 mb-4 w-full md:w-auto">
+                            <h2 class="text-3xl md:text-5xl font-bold text-purple-800 wiggle">Daftar Murid</h2>
+                        </div>
+                        <div class="block md:inline-block bg-gradient-to-r from-yellow-200 to-orange-200 rounded-full px-4 py-2 shadow-sm border-2 border-orange-300 mt-2">
+                            <p class="text-sm md:text-xl text-orange-800 font-bold">
+                                <span class="sparkle">✨</span> Sila isi maklumat anda <span class="sparkle">✨</span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-6 md:space-y-8">
+                        <div class="relative">
+                            <div class="bg-gradient-to-r from-green-200 to-teal-200 rounded-2xl p-3 mb-2 border-2 border-green-400 shadow-sm">
+                                <label class="block text-lg md:text-2xl font-bold text-center text-teal-800">
+                                    <span class="sparkle text-xl md:text-3xl">📝</span> Nama Murid:
+                                </label>
+                            </div>
+                            <input type="text" id="regNama" 
+                                   class="w-full p-4 md:p-6 rounded-2xl bg-gradient-to-r from-white to-green-50 border-4 border-green-300 text-lg md:text-2xl font-bold focus:outline-none focus:border-green-500 transition-all text-center text-green-800 shadow-md" 
+                                   placeholder="✨ Masukkan nama anda... ✨"
+                                   onkeypress="if(event.key==='Enter') document.getElementById('regUmur').focus()">
+                        </div>
+                        
+                        <div class="relative">
+                            <div class="bg-gradient-to-r from-yellow-200 to-orange-200 rounded-2xl p-3 mb-2 border-2 border-yellow-400 shadow-sm">
+                                <label class="block text-lg md:text-2xl font-bold text-center text-orange-800">
+                                    <span class="wiggle text-xl md:text-3xl">🎂</span> Umur:
+                                </label>
+                            </div>
+                            <input type="number" id="regUmur" min="5" max="15"
+                                   class="w-full p-4 md:p-6 rounded-2xl bg-gradient-to-r from-white to-yellow-50 border-4 border-yellow-300 text-lg md:text-2xl font-bold focus:outline-none focus:border-yellow-500 transition-all text-center text-orange-800 shadow-md" 
+                                   placeholder="🎈 Masukkan umur anda... 🎈"
+                                   onkeypress="if(event.key==='Enter') document.getElementById('regNegeri').focus()">
+                        </div>
+                        
+                        <div class="relative">
+                            <div class="bg-gradient-to-r from-purple-200 to-pink-200 rounded-2xl p-3 mb-2 border-2 border-purple-400 shadow-sm">
+                                <label class="block text-lg md:text-2xl font-bold text-center text-purple-800">
+                                    <span class="floating text-xl md:text-3xl">🏛</span> Negeri:
+                                </label>
+                            </div>
+                            <select id="regNegeri" 
+                                    class="w-full p-4 md:p-6 rounded-2xl bg-gradient-to-r from-white to-purple-50 border-4 border-purple-300 text-lg md:text-2xl font-bold focus:outline-none focus:border-purple-500 transition-all text-center text-purple-800 shadow-md">
+                                <option value="">Pilih negeri anda...</option>
+                                <option value="Johor">Johor</option>
+                                <option value="Kedah">Kedah</option>
+                                <option value="Kelantan">Kelantan</option>
+                                <option value="Melaka">Melaka</option>
+                                <option value="Negeri Sembilan">Negeri Sembilan</option>
+                                <option value="Pahang">Pahang</option>
+                                <option value="Perak">Perak</option>
+                                <option value="Perlis">Perlis</option>
+                                <option value="Pulau Pinang">Pulau Pinang</option>
+                                <option value="Sabah">Sabah</option>
+                                <option value="Sarawak">Sarawak</option>
+                                <option value="Selangor">Selangor</option>
+                                <option value="Terengganu">Terengganu</option>
+                                <option value="WP Kuala Lumpur">WP Kuala Lumpur</option>
+                                <option value="WP Labuan">WP Labuan</option>
+                                <option value="WP Putrajaya">WP Putrajaya</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-8 md:mt-12 relative z-10">
+                        <div class="relative inline-block w-full md:w-auto">
+                            <button onclick="processRegistration()" 
+                                    class="w-full md:w-auto bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-4 md:px-16 md:py-6 rounded-full text-xl md:text-3xl font-bold transition-all shadow-xl border-4 border-white activity-btn relative z-10">
+                                <span class="sparkle">🚀</span> Seterusnya <span class="wiggle">➡</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mainMenu" class="hidden fade-in">
+            <div class="p-6 md:p-10 mb-8 md:mb-10 text-center rounded-3xl shadow-xl bg-gradient-to-br from-blue-100 to-purple-100 border-4 border-blue-300 mx-2 md:mx-4 relative overflow-hidden">
+                <div class="relative z-10">
+                    <div class="bg-white/90 rounded-full px-4 py-2 md:px-8 md:py-4 inline-block shadow-md border-2 border-yellow-400 mb-4 md:mb-6">
+                        <h2 class="text-2xl md:text-4xl font-bold text-purple-800">
+                            <span class="text-xl md:text-3xl floating">🌙</span> Assalamualaikum<span class="text-xl md:text-3xl sparkle">✨</span>
+                        </h2>
+                    </div>
+                    <br>
+                    <div class="bg-gradient-to-r from-pink-200 to-purple-200 rounded-full px-6 py-2 md:px-8 md:py-4 inline-block shadow-md border-2 border-pink-400 mb-4 md:mb-6">
+                        <h3 class="text-xl md:text-3xl font-bold rainbow-text wiggle" id="studentWelcome"></h3>
+                    </div>
+                    <br>
+                    <div class="bg-gradient-to-r from-pink-200 to-purple-200 rounded-full px-4 py-2 md:px-6 md:py-3 inline-block shadow-sm border border-pink-300 mb-6">
+                        <p class="text-sm md:text-2xl text-purple-800 font-bold wiggle">🎯 Pilih fasa pembelajaran 🎯</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button onclick="playSound('click'); showLeaderboard()" 
+                                class="bg-gradient-to-r from-purple-400 to-purple-600 hover:from-purple-500 hover:to-purple-700 text-white px-6 py-3 md:px-8 md:py-4 rounded-full text-lg md:text-xl font-bold transition-all shadow-md border-2 border-white activity-btn">
+                            <span class="sparkle">📊</span> Leaderboard
+                        </button>
+                        <button onclick="playSound('click'); resetAllData()" 
+                                class="bg-gradient-to-r from-red-400 to-red-600 hover:from-red-500 hover:to-red-700 text-white px-6 py-3 md:px-8 md:py-4 rounded-full text-lg md:text-xl font-bold transition-all shadow-md border-2 border-white activity-btn">
+                            <span class="wiggle">🔄</span> Reset Semua
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="phaseGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 px-2 md:px-0">
+                </div>
+
+            <div id="finalAssessmentSection" class="px-2 md:px-0">
+                </div>
+        </div>
+
+        <div id="phaseMenu" class="hidden fade-in">
+            <div class="p-4 md:p-8 mb-6 rounded-2xl shadow-lg bg-white/80 border border-gray-200 mx-2 md:mx-4">
+                <div class="text-center mb-6 md:mb-8">
+                    <button onclick="playSound('click'); showMainMenu()" class="w-full sm:w-auto bg-button-green hover:bg-green-400 text-white px-6 py-3 rounded-lg mb-4 md:mb-6 transition-all text-base md:text-lg font-semibold shadow">
+                        <span class="text-lg md:text-xl">🌙</span> Kembali ke Menu Utama
+                    </button>
+                </div>
+                <h2 id="phaseTitle" class="text-xl md:text-3xl font-bold mb-6 md:mb-8 text-center text-gray-800"></h2>
+                <div id="phaseActivities" class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6"></div>
+            </div>
+        </div>
+
+        <div id="leaderboardPage" class="hidden fade-in">
+            <div class="p-4 md:p-8 rounded-2xl shadow-lg bg-white/80 border border-gray-200 mx-2 md:mx-4">
+                <div class="text-center mb-6 md:mb-8">
+                    <button onclick="playSound('click'); showMainMenu()" class="w-full sm:w-auto bg-button-green hover:bg-green-400 text-white px-6 py-3 rounded-lg mb-4 md:mb-6 transition-all text-base md:text-lg font-semibold shadow">
+                        <span class="text-lg md:text-xl">🌙</span> Kembali ke Menu Utama
+                    </button>
+                </div>
+                
+                <div class="text-center mb-8">
+                    <div class="text-5xl md:text-6xl mb-4 floating">🏆</div>
+                    <h2 class="text-2xl md:text-4xl font-bold mb-3 md:mb-4 text-gray-800">📊 Senarai Pencapaian Tertinggi</h2>
+                    <p class="text-base md:text-xl text-gray-600 mb-6">
+                        <span class="text-progress-yellow">✨</span> Top 10 Murid Terbaik <span class="text-progress-yellow">✨</span>
+                    </p>
+                    
+                    <button onclick="playSound('click'); refreshLeaderboard()" 
+                            class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl text-lg md:text-xl font-bold transition-all shadow-md mb-6">
+                        🔄 Segarkan Data
+                    </button>
+                </div>
+                
+                <div id="leaderboardLoading" class="text-center py-8 md:py-12">
+                    <div class="text-5xl md:text-6xl mb-4 floating">⏳</div>
+                    <p class="text-xl md:text-2xl text-gray-600 font-semibold">Memuat data leaderboard...</p>
+                </div>
+                
+                <div id="leaderboardError" class="hidden text-center py-8 md:py-12">
+                    <div class="text-5xl md:text-6xl mb-4">❌</div>
+                    <p class="text-lg md:text-2xl text-red-600 font-semibold mb-4">Gagal memuat data leaderboard</p>
+                    <button onclick="playSound('click'); refreshLeaderboard()" 
+                            class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg text-base md:text-lg font-bold transition-all">
+                        🔄 Cuba Lagi
+                    </button>
+                </div>
+                
+                <div id="leaderboardContent" class="hidden">
+                    <div class="max-w-4xl mx-auto">
+                        <div id="podiumSection" class="mb-10 md:mb-12">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-3xl mx-auto">
+                                <div id="podium2" class="order-2 md:order-1 bg-gradient-to-br from-gray-300 to-gray-400 rounded-2xl p-4 md:p-6 text-center shadow-md border-2 md:border-4 border-gray-500 transform md:translate-y-8">
+                                    <div class="text-3xl md:text-4xl mb-2">🥈</div>
+                                    <div class="text-lg md:text-xl font-bold text-gray-800 mb-2">Tempat Ke-2</div>
+                                    <div class="podium-content"></div>
+                                </div>
+                                
+                                <div id="podium1" class="order-1 md:order-2 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-2xl p-6 md:p-8 text-center shadow-lg border-2 md:border-4 border-yellow-600">
+                                    <div class="text-5xl md:text-6xl mb-3 md:mb-4">🏆</div>
+                                    <div class="text-xl md:text-2xl font-bold text-yellow-900 mb-2 md:mb-3">JUARA</div>
+                                    <div class="podium-content"></div>
+                                </div>
+                                
+                                <div id="podium3" class="order-3 md:order-3 bg-gradient-to-br from-orange-300 to-orange-400 rounded-2xl p-4 md:p-6 text-center shadow-md border-2 md:border-4 border-orange-500 transform md:translate-y-12 mt-4 md:mt-0">
+                                    <div class="text-3xl md:text-4xl mb-2">🥉</div>
+                                    <div class="text-lg md:text-xl font-bold text-orange-800 mb-2">Tempat Ke-3</div>
+                                    <div class="podium-content"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white/90 rounded-2xl p-4 md:p-8 shadow-lg border-2 border-gray-300 overflow-x-auto">
+                            <h3 class="text-xl md:text-3xl font-bold text-center mb-6 md:mb-8 text-gray-800">📋 Senarai Penuh</h3>
+                            <div id="leaderboardTable" class="space-y-3 md:space-y-4 min-w-[300px]">
+                                </div>
+                        </div>
+                        
+                        <div id="noDataState" class="hidden text-center py-8 md:py-12">
+                            <div class="text-5xl md:text-6xl mb-4">📝</div>
+                            <p class="text-xl md:text-2xl text-gray-600 font-semibold mb-3 md:mb-4">Belum ada data pencapaian</p>
+                            <p class="text-base md:text-lg text-gray-500">Jadilah yang pertama untuk muncul di leaderboard!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="activityContent" class="hidden fade-in">
+            <div class="p-4 md:p-8 rounded-2xl shadow-lg bg-white/80 border border-gray-200 mx-2 md:mx-4">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6 md:mb-8 gap-4">
+                    <button onclick="playSound('click'); goBackToPhase()" class="w-full md:w-auto bg-button-green hover:bg-green-400 text-white px-6 py-2 md:px-8 md:py-3 rounded-lg transition-all text-base md:text-lg font-semibold">
+                        <span class="text-lg md:text-xl">🌙</span> Kembali
+                    </button>
+                    <div class="font-bold text-lg md:text-xl text-gray-800 text-center w-full md:w-auto bg-gray-100 rounded-lg py-2">
+                        <span class="text-progress-yellow">✨</span> <span id="questionCounter">Soalan 1 / 10</span> <span class="text-progress-yellow">✨</span>
+                    </div>
+                </div>
+                
+                <div id="activityProgressBar" class="max-w-lg mx-auto mb-6 md:mb-8">
+                    <div class="bg-gray-200 rounded-full h-2 md:h-3 overflow-hidden">
+                        <div id="activityProgress" class="h-full rounded-full transition-all duration-300 bg-progress-yellow" 
+                             style="width: 0%;"></div>
+                    </div>
+                    <div class="text-center mt-2">
+                        <span id="activityProgressText" class="text-sm md:text-lg font-semibold text-gray-800">Kemajuan: 0%</span>
+                    </div>
+                </div>
+                
+                <div id="activityArea" class="text-center">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="fixed bottom-0 left-0 right-0 bg-gray-100 border-t border-gray-300 py-2 px-2 md:px-4 z-40 shadow-lg">
+        <div class="container mx-auto text-center">
+            <div class="text-xs md:text-sm text-gray-700 font-medium">
+                <div class="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-4">
+                    <span>Dibangunkan oleh ❤︎ <strong>Ustazah Sahranie</strong></span>
+                    <span class="hidden md:inline text-gray-400">|</span>
+                    <span>Versi 1.0  • © 2025</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Global State Variables
+        let studentNama = "";
+        let studentUmur = 0;
+        let studentNegeri = "";
+        
+        // Progress Tracking System
+        let phaseProgress = {
+            1: { completed: [], total: 3 }, // 3 activities in phase 1
+            2: { completed: [], total: 3 }, // 3 activities in phase 2
+            3: { completed: [], total: 3 }, // 3 activities in phase 3
+            4: { completed: [], total: 3 }  // 3 activities in phase 4
+        };
+        
+        // Answer Persistence System
+        let savedAnswers = {};
+        let activityStatus = {};
+        
+        // Answer Persistence Functions
+        function saveAnswer(activityId, questionIndex, answer, isCorrect) {
+            const key = `${activityId}_answers`;
+            if (!savedAnswers[key]) {
+                savedAnswers[key] = {};
+            }
+            savedAnswers[key][questionIndex] = {
+                answer: answer,
+                isCorrect: isCorrect,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('fathax_answers', JSON.stringify(savedAnswers));
+        }
+        
+        function loadSavedAnswers() {
+            const saved = localStorage.getItem('fathax_answers');
+            if (saved) {
+                try {
+                    savedAnswers = JSON.parse(saved);
+                } catch (e) {
+                    console.log('Error loading answers:', e);
+                    savedAnswers = {};
+                }
+            }
+        }
+        
+        function saveActivityStatus(activityId, status) {
+            activityStatus[activityId] = {
+                status: status, // 'completed', 'in_progress', 'not_started'
+                score: score,
+                markah: markah,
+                totalQuestions: totalQuestions,
+                currentQuestion: currentQuestion,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('fathax_activity_status', JSON.stringify(activityStatus));
+        }
+        
+        function loadActivityStatus() {
+            const saved = localStorage.getItem('fathax_activity_status');
+            if (saved) {
+                try {
+                    activityStatus = JSON.parse(saved);
+                } catch (e) {
+                    console.log('Error loading activity status:', e);
+                    activityStatus = {};
+                }
+            }
+        }
+        
+        function getActivityStatus(activityId) {
+            return activityStatus[activityId] || { status: 'not_started', score: 0, markah: 0 };
+        }
+        
+        function resetAllData() {
+            if (confirm('Adakah anda pasti mahu reset semua data? Tindakan ini tidak boleh dibatalkan.')) {
+                localStorage.removeItem('fathax_answers');
+                localStorage.removeItem('fathax_activity_status');
+                localStorage.removeItem('fathax_progress');
+                savedAnswers = {};
+                activityStatus = {};
+                phaseProgress = {
+                    1: { completed: [], total: 3 },
+                    2: { completed: [], total: 3 },
+                    3: { completed: [], total: 3 },
+                    4: { completed: [], total: 3 }
+                };
+                showIslamicFeedback('Semua data telah direset! 🔄', 'bg-blue-500');
+                setTimeout(() => {
+                    showMainMenu();
+                }, 2000);
+            }
+        }
+
+        // Sound System
+        function playSound(type) {
+            // Create audio context for Web Audio API
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Sound frequencies and durations
+            const sounds = {
+                'click': { freq: 800, duration: 0.1 },
+                'correct': { freq: 1000, duration: 0.3 },
+                'wrong': { freq: 300, duration: 0.2 },
+                'complete': { freq: 1200, duration: 0.5 }
+            };
+            
+            const sound = sounds[type] || sounds['click'];
+            
+            // Create oscillator
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(sound.freq, audioContext.currentTime);
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + sound.duration);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + sound.duration);
+        }
+
+        // Hijaiyyah letters with fathah and their pronunciations
+        const hijaiyyahLetters = [
+            {arabic: 'أَ', rumi: 'a'}, {arabic: 'بَ', rumi: 'ba'}, {arabic: 'تَ', rumi: 'ta'}, 
+            {arabic: 'ثَ', rumi: 'tsa'}, {arabic: 'جَ', rumi: 'ja'}, {arabic: 'حَ', rumi: 'ha'}, 
+            {arabic: 'خَ', rumi: 'kho'}, {arabic: 'دَ', rumi: 'da'}, {arabic: 'ذَ', rumi: 'dza'}, 
+            {arabic: 'رَ', rumi: 'ro'}, {arabic: 'زَ', rumi: 'za'}, {arabic: 'سَ', rumi: 'sa'}, 
+            {arabic: 'شَ', rumi: 'sya'}, {arabic: 'صَ', rumi: 'sho'}, {arabic: 'ضَ', rumi: 'dho'}, 
+            {arabic: 'طَ', rumi: 'tho'}, {arabic: 'ظَ', rumi: 'zho'}, {arabic: 'عَ', rumi: "'a"}, 
+            {arabic: 'غَ', rumi: 'gho'}, {arabic: 'فَ', rumi: 'fa'}, {arabic: 'قَ', rumi: 'qo'}, 
+            {arabic: 'كَ', rumi: 'ka'}, {arabic: 'لَ', rumi: 'la'}, {arabic: 'مَ', rumi: 'ma'}, 
+            {arabic: 'نَ', rumi: 'na'}, {arabic: 'وَ', rumi: 'wa'}, {arabic: 'هَ', rumi: "ha'"}, 
+            {arabic: 'يَ', rumi: 'ya'}
+        ];
+
+        let currentPhase = 0;
+        let currentActivity = '';
+        let currentQuestion = 0;
+        let totalQuestions = 10;
+        let score = 0;
+        let markah = 0; // New scoring system
+        let currentLetterIndex = 0;
+
+        // Navigation Functions
+        function showRegistration() {
+            playSound('click');
+            document.getElementById('frontPage').classList.add('hidden');
+            document.getElementById('registrationPage').classList.remove('hidden');
+            document.getElementById('regNama').focus();
+        }
+        
+        function processRegistration() {
+            const nama = document.getElementById('regNama').value.trim();
+            const umur = parseInt(document.getElementById('regUmur').value);
+            const negeri = document.getElementById('regNegeri').value;
+            
+            // Validation
+            if (!nama) {
+                playSound('wrong');
+                showIslamicFeedback('Sila masukkan nama anda! 📝', 'bg-red-500');
+                document.getElementById('regNama').focus();
+                return;
+            }
+            
+            if (!umur || umur < 5 || umur > 15) {
+                playSound('wrong');
+                showIslamicFeedback('Umur mestilah antara 5 hingga 15 tahun! 🎂', 'bg-red-500');
+                document.getElementById('regUmur').focus();
+                return;
+            }
+            
+            if (!negeri) {
+                playSound('wrong');
+                showIslamicFeedback('Sila pilih negeri anda! 🏛', 'bg-red-500');
+                document.getElementById('regNegeri').focus();
+                return;
+            }
+            
+            // Save to global state
+            studentNama = nama;
+            studentUmur = umur;
+            studentNegeri = negeri;
+            
+            playSound('correct');
+            showIslamicFeedback(`Assalamualaikum ${nama}! Selamat datang! ☪`, 'bg-green-500');
+            
+            setTimeout(() => {
+                showMainMenu();
+            }, 2000);
+        }
+
+        function getPhaseStars(phase) {
+            const completed = phaseProgress[phase].completed.length;
+            const total = phaseProgress[phase].total;
+            
+            if (completed === total) {
+                return '<span class="text-yellow-300 text-lg md:text-xl">⭐⭐⭐</span>';
+            } else if (completed >= 2) {
+                return '<span class="text-yellow-300 text-lg md:text-xl">⭐⭐</span><span class="text-gray-400 text-lg md:text-xl">⭐</span>';
+            } else if (completed >= 1) {
+                return '<span class="text-yellow-300 text-lg md:text-xl">⭐</span><span class="text-gray-400 text-lg md:text-xl">⭐⭐</span>';
+            } else {
+                return '<span class="text-gray-400 text-lg md:text-xl">⭐⭐⭐</span>';
+            }
+        }
+        
+        // Function to check if a phase is unlocked
+        function isPhaseUnlocked(phase) {
+            // Phase 1 is always unlocked
+            if (phase === 1) {
+                return true;
+            }
+            
+            // For other phases, check if previous phase is completed
+            const previousPhase = phase - 1;
+            const previousCompleted = phaseProgress[previousPhase].completed.length;
+            const previousTotal = phaseProgress[previousPhase].total;
+            
+            return previousCompleted === previousTotal;
+        }
+        
+        // Function to show locked phase message
+        function showPhaseLockedMessage(phase) {
+            const previousPhase = phase - 1;
+            const phaseNames = {
+                1: 'Fasa 1: Huruf Tunggal',
+                2: 'Fasa 2: Gabungan 2 Huruf',
+                3: 'Fasa 3: Gabungan 3 Huruf',
+                4: 'Fasa 4: Ulangkaji Interaktif'
+            };
+            
+            const previousCompleted = phaseProgress[previousPhase].completed.length;
+            const previousTotal = phaseProgress[previousPhase].total;
+            
+            showIslamicFeedback(
+                `🔒 ${phaseNames[phase]} masih terkunci!<br><br>Sila siapkan semua aktiviti dalam ${phaseNames[previousPhase]} terlebih dahulu.<br><br>Kemajuan: ${previousCompleted}/${previousTotal} aktiviti`, 
+                'bg-red-500'
+            );
+        }
+        
+        // Function to check if final assessment is unlocked
+        function isFinalAssessmentUnlocked() {
+            // Check if all phases are completed
+            for (let phase = 1; phase <= 4; phase++) {
+                const completed = phaseProgress[phase].completed.length;
+                const total = phaseProgress[phase].total;
+                if (completed !== total) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        // Function to show locked final assessment message
+        function showFinalAssessmentLockedMessage() {
+            let incompletePhases = [];
+            
+            for (let phase = 1; phase <= 4; phase++) {
+                const completed = phaseProgress[phase].completed.length;
+                const total = phaseProgress[phase].total;
+                if (completed !== total) {
+                    const phaseNames = {
+                        1: 'Fasa 1',
+                        2: 'Fasa 2', 
+                        3: 'Fasa 3',
+                        4: 'Fasa 4'
+                    };
+                    incompletePhases.push(`${phaseNames[phase]} (${completed}/${total})`);
+                }
+            }
+            
+            showIslamicFeedback(
+                `🔒 Penilaian Akhir masih terkunci!<br><br>Sila siapkan semua fasa terlebih dahulu:<br><br>${incompletePhases.join('<br>')}`, 
+                'bg-red-500'
+            );
+        }
+
+        function showMainMenu() {
+            document.getElementById('frontPage').classList.add('hidden');
+            document.getElementById('registrationPage').classList.add('hidden');
+            document.getElementById('mainMenu').classList.remove('hidden');
+            document.getElementById('phaseMenu').classList.add('hidden');
+            document.getElementById('activityContent').classList.add('hidden');
+            document.getElementById('leaderboardPage').classList.add('hidden');
+            
+            // Load progress and answers from localStorage
+            loadProgress();
+            loadSavedAnswers();
+            loadActivityStatus();
+            
+            // Update welcome message
+            document.getElementById('studentWelcome').textContent = studentNama;
+            
+            // Rebuild the main menu with updated phase states
+            buildMainMenu();
+            
+            updateProgress(0);
+        }
+        
+        function showLeaderboard() {
+            document.getElementById('frontPage').classList.add('hidden');
+            document.getElementById('registrationPage').classList.add('hidden');
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('phaseMenu').classList.add('hidden');
+            document.getElementById('activityContent').classList.add('hidden');
+            document.getElementById('leaderboardPage').classList.remove('hidden');
+            
+            // Load leaderboard data
+            loadLeaderboardData();
+        }
+        
+        async function loadLeaderboardData() {
+            // Show loading state
+            document.getElementById('leaderboardLoading').classList.remove('hidden');
+            document.getElementById('leaderboardError').classList.add('hidden');
+            document.getElementById('leaderboardContent').classList.add('hidden');
+            document.getElementById('noDataState').classList.add('hidden');
+            
+            try {
+                const leaderboardData = await window.getLeaderboardData();
+                
+                if (leaderboardData.length === 0) {
+                    // No data available
+                    document.getElementById('leaderboardLoading').classList.add('hidden');
+                    document.getElementById('noDataState').classList.remove('hidden');
+                } else {
+                    // Display leaderboard data
+                    displayLeaderboard(leaderboardData);
+                    document.getElementById('leaderboardLoading').classList.add('hidden');
+                    document.getElementById('leaderboardContent').classList.remove('hidden');
+                }
+            } catch (error) {
+                // Show error state
+                document.getElementById('leaderboardLoading').classList.add('hidden');
+                document.getElementById('leaderboardError').classList.remove('hidden');
+                console.error('Failed to load leaderboard:', error);
+            }
+        }
+        
+        function refreshLeaderboard() {
+            playSound('click');
+            showIslamicFeedback('Menyegarkan data leaderboard... 🔄', 'bg-blue-500');
+            loadLeaderboardData();
+        }
+        
+        function displayLeaderboard(data) {
+            // Display top 3 podium
+            displayPodium(data);
+            
+            // Display full leaderboard table
+            displayLeaderboardTable(data);
+        }
+        
+        function displayPodium(data) {
+            const podiumPositions = ['podium1', 'podium2', 'podium3'];
+            
+            podiumPositions.forEach((podiumId, index) => {
+                const podiumElement = document.getElementById(podiumId);
+                const contentDiv = podiumElement.querySelector('.podium-content');
+                
+                if (data[index]) {
+                    const student = data[index];
+                    const gelaran = getGelaran(student.markah);
+                    
+                    contentDiv.innerHTML = `
+                        <div class="text-xl md:text-2xl font-bold text-gray-800 mb-1 md:mb-2 truncate w-full">${student.nama}</div>
+                        <div class="text-sm md:text-lg text-gray-700 mb-1 md:mb-2">📍 ${student.negeri}</div>
+                        <div class="text-2xl md:text-3xl font-bold ${gelaran.color} mb-1 md:mb-2">${student.markah}%</div>
+                        <div class="text-xs md:text-sm ${gelaran.color} font-semibold">${gelaran.title}</div>
+                    `;
+                    podiumElement.classList.remove('opacity-50');
+                } else {
+                    contentDiv.innerHTML = `
+                        <div class="text-base md:text-lg text-gray-600 font-semibold">Kosong</div>
+                        <div class="text-xs md:text-sm text-gray-500">Belum ada pencapaian</div>
+                    `;
+                    podiumElement.classList.add('opacity-50');
+                }
+            });
+        }
+        
+        function displayLeaderboardTable(data) {
+            const tableContainer = document.getElementById('leaderboardTable');
+            
+            tableContainer.innerHTML = data.map((student, index) => {
+                const rank = index + 1;
+                const gelaran = getGelaran(student.markah);
+                
+                // Medal icons for top 3
+                let rankIcon = '';
+                if (rank === 1) rankIcon = '🏆';
+                else if (rank === 2) rankIcon = '🥈';
+                else if (rank === 3) rankIcon = '🥉';
+                else rankIcon = `${rank}.`;
+                
+                // Background colors for top 3
+                let bgClass = 'bg-white/70';
+                if (rank === 1) bgClass = 'bg-gradient-to-r from-yellow-100 to-yellow-200 border-yellow-400';
+                else if (rank === 2) bgClass = 'bg-gradient-to-r from-gray-100 to-gray-200 border-gray-400';
+                else if (rank === 3) bgClass = 'bg-gradient-to-r from-orange-100 to-orange-200 border-orange-400';
+                
+                return `
+                    <div class="flex flex-row items-center justify-between p-3 md:p-6 rounded-xl shadow-md border-2 ${bgClass} transition-all hover:scale-102 hover:shadow-lg gap-2">
+                        <div class="flex items-center space-x-3 md:space-x-6 w-2/3">
+                            <div class="text-xl md:text-3xl font-bold text-gray-800 min-w-[30px] md:min-w-[60px] text-center">
+                                ${rankIcon}
+                            </div>
+                            <div class="text-left overflow-hidden">
+                                <div class="text-lg md:text-2xl font-bold text-gray-800 mb-1 truncate">${student.nama}</div>
+                                <div class="text-xs md:text-lg text-gray-600">
+                                    🧒 ${student.umur} thn | 📍 ${student.negeri}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-right w-1/3">
+                            <div class="text-2xl md:text-4xl font-bold ${gelaran.color} mb-1">${student.markah}%</div>
+                            <div class="text-xs md:text-sm ${gelaran.color} font-semibold line-clamp-2">${gelaran.title}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Islamic Feedback System
+        function showIslamicFeedback(message, bgClass) {
+            const feedback = document.createElement('div');
+            feedback.className = `fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${bgClass} text-white px-6 md:px-8 py-3 md:py-4 rounded-xl text-lg md:text-xl font-bold z-50 bounce shadow-2xl border-2 border-white/30 w-11/12 max-w-sm text-center`;
+            feedback.innerHTML = `
+                <div class="text-center">
+                    <div class="text-xl md:text-2xl mb-2">${message}</div>
+                    <div class="text-xs md:text-sm opacity-80">
+                        ${bgClass.includes('green') ? 'Masya-Allah! ✦' : bgClass.includes('red') ? 'Jangan putus asa! ☪' : 'Barakallahu feeki! ✦'}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(feedback);
+            
+            setTimeout(() => {
+                if (document.body.contains(feedback)) {
+                    document.body.removeChild(feedback);
+                }
+            }, 2000);
+        }
+
+        function showPhase(phase) {
+            currentPhase = phase;
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('phaseMenu').classList.remove('hidden');
+            document.getElementById('activityContent').classList.add('hidden');
+            document.getElementById('leaderboardPage').classList.add('hidden');
+            
+            const phaseTitle = document.getElementById('phaseTitle');
+            const phaseActivities = document.getElementById('phaseActivities');
+            
+            // Calculate phase progress
+            const completed = phaseProgress[phase].completed.length;
+            const total = phaseProgress[phase].total;
+            const progressPercentage = Math.round((completed / total) * 100);
+            
+            let title = '';
+            let activities = [];
+            
+            switch(phase) {
+                case 1:
+                    title = '🟩 FASA 1: Huruf Tunggal';
+                    activities = [
+                        {id: '1.0', name: 'Kenal Huruf', desc: 'Paparan huruf tunggal dengan sebutan'},
+                        {id: '1.1', name: 'Bunyi ke Huruf', desc: '10 soalan - Pilih huruf dari bunyi'},
+                        {id: '1.2', name: 'Huruf ke Bunyi', desc: '10 soalan - Pilih bunyi dari huruf'}
+                    ];
+                    break;
+                case 2:
+                    title = '🟦 FASA 2: Gabungan 2 Huruf';
+                    activities = [
+                        {id: '2.0', name: 'Kenal Gabungan', desc: '10 paparan rawak'},
+                        {id: '2.1', name: 'Bunyi ke Gabungan', desc: '10 soalan'},
+                        {id: '2.2', name: 'Huruf ke Bunyi', desc: '10 soalan'}
+                    ];
+                    break;
+                case 3:
+                    title = '🟨 FASA 3: Gabungan 3 Huruf';
+                    activities = [
+                        {id: '3.0', name: 'Kenal Gabungan', desc: '10 paparan rawak'},
+                        {id: '3.1', name: 'Bunyi ke Gabungan', desc: '10 soalan'},
+                        {id: '3.2', name: 'Huruf ke Bunyi', desc: '10 soalan'}
+                    ];
+                    break;
+                case 4:
+                    title = '🟥 FASA 4: Ulangkaji Interaktif';
+                    activities = [
+                        {id: '4.1', name: 'Seret & Padankan', desc: '10 soalan susunan'},
+                        {id: '4.2', name: 'Cari Padanan Kad', desc: '10 soalan padanan'},
+                        {id: '4.3', name: 'Cabaran 30 Saat', desc: '20 soalan rawak pantas'}
+                    ];
+                    break;
+            }
+            
+            // Phase completion status
+            const completionStatus = progressPercentage === 100 ? 
+                `<div class="text-center mt-4 mb-4 md:mb-6">
+                    <div class="bg-green-500/20 rounded-xl p-3 md:p-4 border-2 border-green-400">
+                        <div class="text-xl md:text-2xl mb-1 md:mb-2">⭐⭐⭐</div>
+                        <p class="text-green-600 font-bold text-base md:text-lg">✅ Fasa ${phase} lengkap!</p>
+                        <p class="text-gray-700 text-xs md:text-sm">Tahniah! Semua aktiviti disiapkan.</p>
+                    </div>
+                </div>` : '';
+            
+            phaseTitle.innerHTML = `
+                <div class="text-center">
+                    <div class="mb-4 md:mb-6 text-lg md:text-2xl whitespace-nowrap overflow-hidden text-ellipsis">
+                        <span class="text-xl md:text-2xl">🌙</span> ${title} <span class="text-xl md:text-2xl">✨</span>
+                    </div>
+                    
+                    <div class="max-w-md mx-auto mb-4 md:mb-6 px-2">
+                        <div class="flex justify-between items-center mb-2 md:mb-3">
+                            <span class="text-sm md:text-lg text-gray-700 font-semibold">Kemajuan Fasa</span>
+                            <span class="text-sm md:text-lg text-gray-800 font-bold">${completed}/${total} (${progressPercentage}%)</span>
+                        </div>
+                        <div class="bg-gray-200 rounded-full h-3 md:h-4 overflow-hidden">
+                            <div class="bg-progress-yellow h-full rounded-full transition-all duration-500" 
+                                 style="width: ${progressPercentage}%;"></div>
+                        </div>
+                    </div>
+                    ${completionStatus}
+                </div>
+            `;
+            
+            phaseActivities.innerHTML = activities.map((activity, index) => {
+                const isCompleted = phaseProgress[phase].completed.includes(activity.id);
+                const isLocked = !isActivityUnlocked(phase, activity.id, index);
+                const activityStat = getActivityStatus(activity.id);
+                const hasAnswers = savedAnswers[`${activity.id}_answers`] && Object.keys(savedAnswers[`${activity.id}_answers`]).length > 0;
+                
+                let statusIcon = '';
+                let statusClass = '';
+                let statusLabel = '';
+                let clickHandler = '';
+                let cursorClass = 'cursor-pointer';
+                
+                if (isCompleted) {
+                    statusIcon = '<div class="absolute top-2 right-2 text-green-400 text-lg md:text-xl">✅</div>';
+                    statusClass = 'border-green-400 bg-green-500/10';
+                    statusLabel = '<div class="text-green-600 text-xs md:text-sm font-bold">✅ Selesai</div>';
+                    clickHandler = `onclick="playSound('click'); startActivity('${activity.id}')"`;
+                } else if (isLocked) {
+                    statusIcon = '<div class="absolute top-2 right-2 text-red-400 text-lg md:text-xl">🔒</div>';
+                    statusClass = 'border-red-400/50 bg-red-500/10 opacity-60';
+                    statusLabel = '<div class="text-red-400 text-xs md:text-sm font-bold">🔒 Terkunci</div>';
+                    clickHandler = `onclick="playSound('wrong'); showLockedMessage('${activity.name}', ${index})"`;
+                    cursorClass = 'cursor-not-allowed';
+                } else if (hasAnswers) {
+                    statusIcon = '<div class="absolute top-2 right-2 text-yellow-400 text-lg md:text-xl">📝</div>';
+                    statusClass = 'border-yellow-400 bg-yellow-500/10';
+                    statusLabel = `<div class="text-yellow-600 text-xs md:text-sm font-bold">📝 Dijawab (${activityStat.score || 0}/${activityStat.totalQuestions || 10})</div>`;
+                    clickHandler = `onclick="playSound('click'); startActivity('${activity.id}')"`;
+                } else {
+                    statusIcon = '<div class="absolute top-2 right-2 text-blue-400 text-lg md:text-xl">🔓</div>';
+                    statusClass = 'border-blue-400 bg-blue-500/10';
+                    statusLabel = '<div class="text-blue-600 text-xs md:text-sm font-bold">❌ Belum</div>';
+                    clickHandler = `onclick="playSound('click'); startActivity('${activity.id}')"`;
+                }
+                
+                return `
+                    <div class="bg-button-green hover:bg-green-400 rounded-xl p-4 md:p-6 text-white transition-all shadow-md border-2 ${statusClass} ${cursorClass} relative" ${clickHandler}>
+                        ${statusIcon}
+                        <h4 class="font-bold mb-2 md:mb-3 text-lg md:text-xl truncate pr-6">${activity.name}</h4>
+                        <p class="text-sm md:text-base opacity-90 mb-2 line-clamp-2">${activity.desc}</p>
+                        ${statusLabel}
+                        <div class="mt-2 md:mt-3 text-progress-yellow text-sm md:text-lg">
+                            <span>✨ ✨</span>
+                        </div>
+                        ${isLocked ? '<div class="absolute inset-0 bg-black/10 rounded-xl"></div>' : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function goBackToPhase() {
+            if (currentActivity === 'final') {
+                showMainMenu();
+            } else {
+                showPhase(currentPhase);
+            }
+        }
+
+        // Function to calculate title based on marks
+        function getGelaran(markah) {
+            if (markah === 100) return { title: '🥇 Wira Fatha-X', color: 'text-yellow-500' };
+            if (markah >= 90) return { title: '🥈 Mujahid Pintar', color: 'text-gray-500' };
+            if (markah >= 80) return { title: '🥉 Pejuang Huruf', color: 'text-orange-500' };
+            if (markah >= 70) return { title: '🎖 Pengembara', color: 'text-purple-500' };
+            if (markah >= 60) return { title: '🎓 Sahabat Bunyi', color: 'text-blue-500' };
+            if (markah >= 50) return { title: '📘 Pemula', color: 'text-green-500' };
+            return { title: '🌱 Dalam Latihan', color: 'text-red-500' };
+        }
+
+        // Function to check if an activity is unlocked
+        function isActivityUnlocked(phase, activityId, activityIndex) {
+            // First activity in each phase is always unlocked
+            if (activityIndex === 0) {
+                return true;
+            }
+            
+            // Get the list of activities for this phase
+            let activities = [];
+            switch(phase) {
+                case 1:
+                    activities = ['1.0', '1.1', '1.2'];
+                    break;
+                case 2:
+                    activities = ['2.0', '2.1', '2.2'];
+                    break;
+                case 3:
+                    activities = ['3.0', '3.1', '3.2'];
+                    break;
+                case 4:
+                    activities = ['4.1', '4.2', '4.3'];
+                    break;
+            }
+            
+            // Check if all previous activities are completed
+            for (let i = 0; i < activityIndex; i++) {
+                if (!phaseProgress[phase].completed.includes(activities[i])) {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        // Function to show locked activity message
+        function showLockedMessage(activityName, activityIndex) {
+            let previousActivityName = '';
+            
+            switch(currentPhase) {
+                case 1:
+                    const phase1Activities = ['Kenal Huruf', 'Bunyi ke Huruf', 'Huruf ke Bunyi'];
+                    previousActivityName = phase1Activities[activityIndex - 1];
+                    break;
+                case 2:
+                    const phase2Activities = ['Kenal Gabungan 2 Huruf', 'Bunyi ke Gabungan 2 Huruf', 'Huruf ke Bunyi (2 huruf)'];
+                    previousActivityName = phase2Activities[activityIndex - 1];
+                    break;
+                case 3:
+                    const phase3Activities = ['Kenal Gabungan 3 Huruf', 'Bunyi ke Gabungan 3 Huruf', 'Huruf ke Bunyi (3 huruf)'];
+                    previousActivityName = phase3Activities[activityIndex - 1];
+                    break;
+                case 4:
+                    const phase4Activities = ['Seret & Padankan', 'Cari Padanan Kad', 'Cabaran 30 Saat'];
+                    previousActivityName = phase4Activities[activityIndex - 1];
+                    break;
+            }
+            
+            showIslamicFeedback(
+                `🔒 "${activityName}" terkunci!<br><br>Siapkan "${previousActivityName}".`, 
+                'bg-red-500'
+            );
+        }
+        
+        function startActivity(activityId) {
+            // Check if activity is unlocked before starting
+            const activities = getActivitiesForPhase(currentPhase);
+            const activityIndex = activities.findIndex(act => act.id === activityId);
+            
+            if (!isActivityUnlocked(currentPhase, activityId, activityIndex)) {
+                const activityName = activities[activityIndex].name;
+                showLockedMessage(activityName, activityIndex);
+                return;
+            }
+            
+            currentActivity = activityId;
+            
+            // Load saved progress if exists
+            const savedStatus = getActivityStatus(activityId);
+            if (savedStatus.status !== 'not_started') {
+                currentQuestion = savedStatus.currentQuestion || 0;
+                score = savedStatus.score || 0;
+                markah = savedStatus.markah || 0;
+                totalQuestions = savedStatus.totalQuestions || 10;
+            } else {
+                currentQuestion = 0;
+                score = 0;
+                markah = 0;
+                currentLetterIndex = 0;
+            }
+            
+            document.getElementById('phaseMenu').classList.add('hidden');
+            document.getElementById('activityContent').classList.remove('hidden');
+            document.getElementById('leaderboardPage').classList.add('hidden');
+            
+            if (activityId.endsWith('.0')) {
+                startLearningActivity(activityId);
+            } else {
+                startQuizActivity(activityId);
+            }
+        }
+        
+        // Helper function to get activities for a phase
+        function getActivitiesForPhase(phase) {
+            switch(phase) {
+                case 1:
+                    return [
+                        {id: '1.0', name: 'Kenal Huruf'},
+                        {id: '1.1', name: 'Bunyi ke Huruf'},
+                        {id: '1.2', name: 'Huruf ke Bunyi'}
+                    ];
+                case 2:
+                    return [
+                        {id: '2.0', name: 'Kenal Gabungan 2 Huruf'},
+                        {id: '2.1', name: 'Bunyi ke Gabungan 2 Huruf'},
+                        {id: '2.2', name: 'Huruf ke Bunyi (2 huruf)'}
+                    ];
+                case 3:
+                    return [
+                        {id: '3.0', name: 'Kenal Gabungan 3 Huruf'},
+                        {id: '3.1', name: 'Bunyi ke Gabungan 3 Huruf'},
+                        {id: '3.2', name: 'Huruf ke Bunyi (3 huruf)'}
+                    ];
+                case 4:
+                    return [
+                        {id: '4.1', name: 'Seret & Padankan'},
+                        {id: '4.2', name: 'Cari Padanan Kad'},
+                        {id: '4.3', name: 'Cabaran 30 Saat'}
+                    ];
+                default:
+                    return [];
+            }
+        }
+
+        function startLearningActivity(activityId) {
+            totalQuestions = activityId === '1.0' ? 28 : 10;
+            document.getElementById('questionCounter').textContent = `Paparan ${currentLetterIndex + 1} / ${totalQuestions}`;
+            updateActivityProgress(currentLetterIndex, totalQuestions);
+            
+            if (activityId === '1.0') {
+                showSingleLetter();
+            } else if (activityId === '2.0') {
+                showTwoLetterCombination();
+            } else if (activityId === '3.0') {
+                showThreeLetterCombination();
+            }
+        }
+
+        function showSingleLetter() {
+            if (currentLetterIndex >= hijaiyyahLetters.length) {
+                showCompletionMessage();
+                return;
+            }
+            
+            const letter = hijaiyyahLetters[currentLetterIndex];
+            document.getElementById('activityArea').innerHTML = `
+                <div class="flex flex-col items-center justify-center text-center space-y-6 md:space-y-8">
+                    <div class="bg-white/90 rounded-2xl p-6 md:p-12 shadow-lg border-2 border-pastel-green w-full max-w-sm">
+                        <div class="arabic-text text-7xl md:text-9xl mb-4 md:mb-6 bounce">${letter.arabic}</div>
+                        <div class="rumi-text text-3xl md:text-5xl font-bold mb-3 md:mb-4">${letter.rumi}</div>
+                        <div class="text-lg md:text-2xl text-gray-600 font-semibold">🌙 Huruf ${currentLetterIndex + 1} / ${hijaiyyahLetters.length} ✨</div>
+                    </div>
+                    <button onclick="playSound('click'); nextLetter()" class="answer-btn bg-button-green hover:bg-green-400 text-white text-lg md:text-2xl font-bold px-8 py-4 md:px-12 md:py-6 rounded-2xl shadow-lg transform hover:scale-105 transition-all w-full max-w-sm">
+                        ${currentLetterIndex < hijaiyyahLetters.length - 1 ? '🌙 Seterusnya →' : '✨ Selesai ✦'}
+                    </button>
+                </div>
+            `;
+        }
+
+        function showTwoLetterCombination() {
+            if (currentQuestion >= 10) {
+                showCompletionMessage();
+                return;
+            }
+            
+            const letter1 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+            const letter2 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+            
+            document.getElementById('activityArea').innerHTML = `
+                <div class="flex flex-col items-center justify-center text-center space-y-6 md:space-y-8">
+                    <div class="bg-white/90 rounded-2xl p-6 md:p-12 shadow-lg border-2 border-pastel-blue w-full max-w-sm">
+                        <div class="arabic-text text-5xl md:text-7xl mb-4 md:mb-6 bounce">
+                            ${letter1.arabic} ${letter2.arabic}
+                        </div>
+                        <div class="rumi-text text-2xl md:text-4xl font-bold mb-3 md:mb-4">${letter1.rumi} ${letter2.rumi}</div>
+                        <div class="text-lg md:text-2xl text-gray-600 font-semibold">🌙 Paparan ${currentQuestion + 1} / 10 ✨</div>
+                    </div>
+                    <button onclick="playSound('click'); nextTwoCombination()" class="answer-btn bg-pastel-blue hover:bg-blue-300 text-white text-lg md:text-2xl font-bold px-8 py-4 md:px-12 md:py-6 rounded-2xl shadow-lg transform hover:scale-105 transition-all w-full max-w-sm">
+                        ${currentQuestion < 9 ? '🌙 Seterusnya →' : '✨ Selesai ✦'}
+                    </button>
+                </div>
+            `;
+        }
+
+        function showThreeLetterCombination() {
+            if (currentQuestion >= 10) {
+                showCompletionMessage();
+                return;
+            }
+            
+            const letter1 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+            const letter2 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+            const letter3 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+            
+            document.getElementById('activityArea').innerHTML = `
+                <div class="flex flex-col items-center justify-center text-center space-y-6 md:space-y-8">
+                    <div class="bg-white/90 rounded-2xl p-6 md:p-12 shadow-lg border-2 border-pastel-orange w-full max-w-sm md:max-w-md">
+                        <div class="arabic-text text-4xl md:text-6xl mb-4 md:mb-6 bounce">
+                            ${letter1.arabic} ${letter2.arabic} ${letter3.arabic}
+                        </div>
+                        <div class="rumi-text text-xl md:text-3xl font-bold mb-3 md:mb-4" style="color: #333333;">${letter1.rumi} ${letter2.rumi} ${letter3.rumi}</div>
+                        <div class="text-lg md:text-2xl text-gray-600 font-semibold">🌙 Paparan ${currentQuestion + 1} / 10 ✨</div>
+                    </div>
+                    <button onclick="playSound('click'); nextThreeCombination()" class="answer-btn bg-pastel-orange hover:bg-orange-300 text-white text-lg md:text-2xl font-bold px-8 py-4 md:px-12 md:py-6 rounded-2xl shadow-lg transform hover:scale-105 transition-all w-full max-w-sm">
+                        ${currentQuestion < 9 ? '🌙 Seterusnya →' : '✨ Selesai ✦'}
+                    </button>
+                </div>
+            `;
+        }
+
+        function nextLetter() {
+            currentLetterIndex++;
+            if (currentLetterIndex >= hijaiyyahLetters.length) {
+                showCompletionMessage();
+                return;
+            }
+            document.getElementById('questionCounter').textContent = `Huruf ${currentLetterIndex + 1} / ${hijaiyyahLetters.length}`;
+            updateProgress((currentLetterIndex / hijaiyyahLetters.length) * 100);
+            updateActivityProgress(currentLetterIndex, hijaiyyahLetters.length);
+            showSingleLetter();
+        }
+
+        function nextTwoCombination() {
+            currentQuestion++;
+            if (currentQuestion >= 10) {
+                showCompletionMessage();
+                return;
+            }
+            document.getElementById('questionCounter').textContent = `Paparan ${currentQuestion + 1} / 10`;
+            updateProgress((currentQuestion / 10) * 100);
+            updateActivityProgress(currentQuestion, 10);
+            showTwoLetterCombination();
+        }
+
+        function nextThreeCombination() {
+            currentQuestion++;
+            if (currentQuestion >= 10) {
+                showCompletionMessage();
+                return;
+            }
+            document.getElementById('questionCounter').textContent = `Paparan ${currentQuestion + 1} / 10`;
+            updateProgress((currentQuestion / 10) * 100);
+            updateActivityProgress(currentQuestion, 10);
+            showThreeLetterCombination();
+        }
+
+        // TERTENTU: Ini akan auto redirect ke laman menu fasa apabila menekan selesai di hujung aktiviti belajar
+        function showCompletionMessage() {
+            // Mark activity as completed and save status
+            markActivityCompleted(currentActivity);
+            saveActivityStatus(currentActivity, 'completed');
+            playSound('complete');
+
+            document.getElementById('activityArea').innerHTML = `
+                <div class="text-center py-12">
+                    <div class="text-7xl mb-4 bounce">🎉</div>
+                    <h3 class="text-3xl text-gray-800 font-bold mb-4">Tahniah!</h3>
+                    <p class="text-xl text-green-600 font-bold mb-6">Aktiviti selesai.</p>
+                    <div class="mt-4 text-gray-500 animate-pulse">Kembali ke menu fasa... ⏳</div>
+                </div>
+            `;
+
+            // Auto-redirect to previous page
+            setTimeout(() => {
+                goBackToPhase();
+            }, 1500);
+        }
+
+        // Data for drag and drop activity
+        let susunList = [
+            { bunyi: "ro ka ba", hurufList: ["رَ", "كَ", "بَ"] },
+            { bunyi: "dza ka ro", hurufList: ["ذَ", "كَ", "رَ"] },
+            { bunyi: "sya la ma", hurufList: ["شَ", "لَ", "مَ"] },
+            { bunyi: "fa sa ta", hurufList: ["فَ", "سَ", "تَ"] },
+            { bunyi: "ka ta ba", hurufList: ["كَ", "تَ", "بَ"] },
+            { bunyi: "na za ra", hurufList: ["نَ", "زَ", "رَ"] },
+            { bunyi: "ja la sa", hurufList: ["جَ", "لَ", "سَ"] },
+            { bunyi: "ba ka ro", hurufList: ["بَ", "كَ", "رَ"] },
+            { bunyi: "ma tsa la", hurufList: ["مَ", "ثَ", "لَ"] },
+            { bunyi: "ta la ba", hurufList: ["تَ", "لَ", "بَ"] }
+        ];
+
+        let currentDragQuestion = null;
+        let dropTargets = [];
+        let draggedElement = null;
+
+        // Data for card matching activity
+        let kadPadananList = [
+            [{ huruf: "بَ", bunyi: "ba" },{ huruf: "تَ", bunyi: "ta" },{ huruf: "سَ", bunyi: "sa" }],
+            [{ huruf: "رَ", bunyi: "ro" },{ huruf: "قَ", bunyi: "qo" },{ huruf: "دَ", bunyi: "da" }],
+            [{ huruf: "شَ", bunyi: "sya" },{ huruf: "فَ", bunyi: "fa" },{ huruf: "زَ", bunyi: "za" }],
+            [{ huruf: "جَ", bunyi: "ja" },{ huruf: "نَ", bunyi: "na" },{ huruf: "ظَ", bunyi: "zho" }],
+            [{ huruf: "عَ", bunyi: "'a" },{ huruf: "غَ", bunyi: "gho" },{ huruf: "طَ", bunyi: "tho" }],
+            [{ huruf: "حَ", bunyi: "ha" },{ huruf: "خَ", bunyi: "kho" },{ huruf: "مَ", bunyi: "ma" }],
+            [{ huruf: "لَ", bunyi: "la" },{ huruf: "وَ", bunyi: "wa" },{ huruf: "يَ", bunyi: "ya" }],
+            [{ huruf: "ثَ", bunyi: "tsa" },{ huruf: "ذَ", bunyi: "dza" },{ huruf: "صَ", bunyi: "sho" }],
+            [{ huruf: "ضَ", bunyi: "dho" },{ huruf: "كَ", bunyi: "ka" },{ huruf: "هَ", bunyi: "ha'" }],
+            [{ huruf: "أَ", bunyi: "a" },{ huruf: "جَ", bunyi: "ja" },{ huruf: "رَ", bunyi: "ro" }]
+        ];
+
+        let currentCardSet = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let canFlip = true;
+
+        // Data for final assessment
+        let penilaianList = [
+            { soalan: "Apakah huruf untuk bunyi 'ba'?", pilihan: ["بَ", "تَ", "سَ", "فَ"], jawapan: "بَ" },
+            { soalan: "Apakah huruf untuk bunyi 'ta'?", pilihan: ["تَ", "خَ", "شَ", "زَ"], jawapan: "تَ" },
+            { soalan: "Apakah bunyi bagi huruf 'جَ'?", pilihan: ["ja", "sa", "ra", "ga"], jawapan: "ja" },
+            { soalan: "Apakah bunyi bagi huruf 'قَ'?", pilihan: ["qo", "ka", "gho", "fa"], jawapan: "qo" },
+            { soalan: "Padankan 'رَ كَ بَ' dengan bunyi?", pilihan: ["ro ka ba", "ka ba ro", "ba ka ro", "ro fa ba"], jawapan: "ro ka ba" },
+            { soalan: "Padankan 'فَ تَ حَ' dengan bunyi?", pilihan: ["fa ta ha", "ta ha fa", "fa sya ha'", "fa ka na"], jawapan: "fa ta ha" },
+            { soalan: "Huruf manakah mewakili bunyi 'sya'?", pilihan: ["شَ", "سَ", "زَ", "جَ"], jawapan: "شَ" },
+            { soalan: "Apakah huruf untuk bunyi 'kho'?", pilihan: ["خَ", "حَ", "غَ", "خُ"], jawapan: "خَ" },
+            { soalan: "Apakah bunyi bagi huruf 'سَ'?", pilihan: ["sa", "sya", "za", "ta"], jawapan: "sa" },
+            { soalan: "Apakah huruf untuk bunyi 'la'?", pilihan: ["لَ", "بَ", "رَ", "دَ"], jawapan: "لَ" },
+            { soalan: "Bunyi untuk 'نَ زَ رَ' ialah?", pilihan: ["na za ro", "na sa ro", "ro ka ba", "za ta ro"], jawapan: "na za ro" },
+            { soalan: "Huruf untuk bunyi 'tsa' ialah?", pilihan: ["ثَ", "ذَ", "تَ", "زَ"], jawapan: "ثَ" },
+            { soalan: "Apakah bunyi bagi huruf 'عَ'?", pilihan: ["'a", "gho", "ka", "ro"], jawapan: "'a" },
+            { soalan: "Padankan 'مَ ثَ لَ' dengan bunyi?", pilihan: ["ma tsa la", "ma sa la", "sya la ma", "tho la ka"], jawapan: "ma tsa la" },
+            { soalan: "Apakah bunyi bagi huruf 'دَ'?", pilihan: ["da", "za", "ro", "ba"], jawapan: "da" },
+            { soalan: "Apakah huruf untuk bunyi 'gho'?", pilihan: ["غَ", "عَ", "جَ", "خَ"], jawapan: "غَ" },
+            { soalan: "Apakah huruf yang sesuai untuk bunyi 'tho'?", pilihan: ["طَ", "تَ", "دَ", "قَ"], jawapan: "طَ" },
+            { soalan: "Bunyi bagi 'ذَ' ialah?", pilihan: ["dza", "za", "da", "ro"], jawapan: "dza" },
+            { soalan: "Padankan 'تَ لَ بَ' dengan bunyi?", pilihan: ["ta la ba", "ba la ta", "la ba ta", "ta ka na"], jawapan: "ta la ba" },
+            { soalan: "Bunyi bagi 'شَ جَ' ialah?", pilihan: ["sya ja", "sa ja", "sya za", "sya la"], jawapan: "sya ja" }
+        ];
+
+        // Data for 30-second challenge
+        let soalanPantas = [
+            { soalan: "Apakah huruf untuk bunyi 'ba'?", pilihan: ["بَ", "تَ", "سَ", "فَ"], jawapan: "بَ" },
+            { soalan: "Apakah huruf untuk bunyi 'ta'?", pilihan: ["تَ", "نَ", "زَ", "خَ"], jawapan: "تَ" },
+            { soalan: "Apakah bunyi untuk huruf 'قَ'?", pilihan: ["qo", "ka", "fa", "gho"], jawapan: "qo" },
+            { soalan: "Apakah bunyi untuk huruf 'شَ'?", pilihan: ["sya", "sa", "za", "ja"], jawapan: "sya" },
+            { soalan: "Padankan huruf 'رَ كَ بَ' dengan bunyi?", pilihan: ["ro ka ba", "ka ba ro", "ba ta sa", "ro fa la"], jawapan: "ro ka ba" },
+            { soalan: "Padankan huruf 'فَ تَ حَ' dengan bunyi?", pilihan: ["fa ta ha", "ta ha fa", "fa sya ha'", "fa la ma"], jawapan: "fa ta ha" },
+            { soalan: "Huruf manakah yang mewakili bunyi 'za'?", pilihan: ["زَ", "سَ", "رَ", "ذَ"], jawapan: "زَ" },
+            { soalan: "Bunyi bagi huruf 'ذَ' ialah?", pilihan: ["dza", "da", "za", "ra"], jawapan: "dza" },
+            { soalan: "Apakah huruf yang sesuai untuk bunyi 'gho'?", pilihan: ["غَ", "جَ", "خَ", "قَ"], jawapan: "غَ" },
+            { soalan: "Apakah huruf yang sesuai untuk bunyi ''a'?", pilihan: ["عَ", "غَ", "جَ", "دَ"], jawapan: "عَ" },
+            { soalan: "Padankan huruf 'مَ ثَ لَ' dengan bunyi?", pilihan: ["ma tsa la", "ma sa la", "tsa la ma", "sya tho la"], jawapan: "ma tsa la" },
+            { soalan: "Apakah bunyi untuk huruf 'نَ'?", pilihan: ["na", "ta", "ra", "sa"], jawapan: "na" },
+            { soalan: "Huruf 'بَ' mewakili bunyi apa?", pilihan: ["ba", "ka", "fa", "la"], jawapan: "ba" },
+            { soalan: "Apakah huruf untuk bunyi 'ka'?", pilihan: ["كَ", "قَ", "فَ", "كِ"], jawapan: "كَ" },
+            { soalan: "Padankan huruf 'تَ لَ بَ' dengan bunyi?", pilihan: ["ta la ba", "ba la ta", "la ta ba", "ta sa ba"], jawapan: "ta la ba" }
+        ];
+
+        let challengeTimer = null;
+        let timeLeft = 30;
+        let challengeScore = 0;
+        let currentChallengeQuestion = null;
+        let usedQuestions = [];
+
+        // Final assessment variables
+        let finalAssessmentQuestions = [];
+        let currentFinalQuestion = null;
+
+        function startQuizActivity(activityId) {
+            totalQuestions = 10;
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('questionCounter').textContent = `Soalan ${currentQuestion + 1} / ${totalQuestions}`;
+            updateActivityProgress(0, totalQuestions);
+            
+            if (activityId === '1.1') showSoundToLetterQuiz();
+            else if (activityId === '1.2') showLetterToSoundQuiz();
+            else if (activityId === '2.1') showSoundToTwoLetterQuiz();
+            else if (activityId === '2.2') showTwoLetterToSoundQuiz();
+            else if (activityId === '3.1') showSoundToThreeLetterQuiz();
+            else if (activityId === '3.2') showThreeLetterToSoundQuiz();
+            else if (activityId === '4.1') showDragDropQuiz();
+            else if (activityId === '4.2') showCardMatchingGame();
+            else if (activityId === '4.3') show30SecondChallenge();
+        }
+
+        function showSoundToLetterQuiz() {
+            if (currentQuestion >= totalQuestions) {
+                showQuizResults();
+                return;
+            }
+            
+            const correctLetter = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+            const options = [correctLetter];
+            
+            while (options.length < 4) {
+                const randomLetter = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+                if (!options.find(opt => opt.arabic === randomLetter.arabic)) {
+                    options.push(randomLetter);
+                }
+            }
+            
+            // Shuffle options
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+            
+            document.getElementById('activityArea').innerHTML = `
+                <div class="flex flex-col items-center justify-center text-center space-y-6 md:space-y-8">
+                    <div class="bg-white/90 rounded-2xl p-6 md:p-8 shadow-lg border-2 border-button-green w-full max-w-sm md:max-w-md">
+                        <h3 class="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-800">🌙 Pilih huruf untuk bunyi ✨</h3>
+                        <div class="rumi-text text-4xl md:text-6xl font-bold mb-2">${correctLetter.rumi}</div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 md:gap-6 max-w-2xl mx-auto w-full px-2">
+                        ${options.map(option => `
+                            <button onclick="playSound('click'); checkAnswer('${option.arabic}', '${correctLetter.arabic}')" 
+                                    class="answer-btn bg-button-green hover:bg-green-400 text-gray-800 arabic-text text-4xl md:text-5xl py-8 md:py-12 rounded-2xl shadow-md transform hover:scale-105 transition-all">
+                                ${option.arabic}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function showLetterToSoundQuiz() {
+            if (currentQuestion >= totalQuestions) {
+                showQuizResults();
+                return;
+            }
+            
+            const correctLetter = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+            const options = [correctLetter];
+            
+            while (options.length < 4) {
+                const randomLetter = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+                if (!options.find(opt => opt.rumi === randomLetter.rumi)) {
+                    options.push(randomLetter);
+                }
+            }
+            
+            // Shuffle options
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+            
+            document.getElementById('activityArea').innerHTML = `
+                <div class="flex flex-col items-center justify-center text-center space-y-6 md:space-y-8">
+                    <div class="bg-white/90 rounded-2xl p-6 md:p-8 shadow-lg border-2 border-button-green w-full max-w-sm md:max-w-md">
+                        <h3 class="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-800">🌙 Pilih bunyi untuk huruf ✨</h3>
+                        <div class="arabic-text text-5xl md:text-7xl mb-2 bounce">${correctLetter.arabic}</div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 md:gap-6 max-w-2xl mx-auto w-full px-2">
+                        ${options.map((option, index) => `
+                            <button id="option_${index}" onclick="playSound('click'); checkLetterToSoundAnswer('${option.rumi.replace(/'/g, "\\'")}', '${correctLetter.rumi.replace(/'/g, "\\'")}')" 
+                                    class="answer-btn bg-button-green hover:bg-green-400 text-gray-800 rumi-text text-xl md:text-3xl py-6 md:py-8 rounded-2xl shadow-md transform hover:scale-105 transition-all cursor-pointer">
+                                ${option.rumi}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkAnswer(selected, correct) {
+            const isCorrect = selected === correct;
+            saveAnswer(currentActivity, currentQuestion, selected, isCorrect);
+            
+            if (isCorrect) {
+                score++;
+                markah += 2;
+                playSound('correct');
+                showIslamicFeedback('Masya-Allah, jawapan betul! ✦', 'bg-green-500');
+            } else {
+                playSound('wrong');
+                showIslamicFeedback('Jangan putus asa! Cuba lagi! ☪', 'bg-red-500');
+            }
+            
+            saveActivityStatus(currentActivity, 'in_progress');
+            
+            setTimeout(() => {
+                currentQuestion++;
+                document.getElementById('questionCounter').textContent = `Soalan ${currentQuestion + 1} / ${totalQuestions}`;
+                updateProgress((currentQuestion / totalQuestions) * 100);
+                updateActivityProgress(currentQuestion, totalQuestions);
+                
+                if (currentActivity === '1.1') showSoundToLetterQuiz();
+                else if (currentActivity === '1.2') showLetterToSoundQuiz();
+                else if (currentActivity === '2.1') showSoundToTwoLetterQuiz();
+                else if (currentActivity === '2.2') showTwoLetterToSoundQuiz();
+                else if (currentActivity === '3.1') showSoundToThreeLetterQuiz();
+                else if (currentActivity === '3.2') showThreeLetterToSoundQuiz();
+            }, 1500);
+        }
+
+        function checkLetterToSoundAnswer(selected, correct) {
+            const buttons = document.querySelectorAll('#activityArea button');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            });
+            
+            const isCorrect = selected === correct;
+            saveAnswer(currentActivity, currentQuestion, selected, isCorrect);
+            
+            if (isCorrect) {
+                score++;
+                markah += 2;
+                playSound('correct');
+                showIslamicFeedback('Masya-Allah, jawapan betul! ✦', 'bg-green-500');
+            } else {
+                playSound('wrong');
+                showIslamicFeedback('Jangan putus asa! Cuba lagi! ☪', 'bg-red-500');
+            }
+            
+            saveActivityStatus(currentActivity, 'in_progress');
+            
+            setTimeout(() => {
+                currentQuestion++;
+                document.getElementById('questionCounter').textContent = `Soalan ${currentQuestion + 1} / ${totalQuestions}`;
+                updateProgress((currentQuestion / totalQuestions) * 100);
+                updateActivityProgress(currentQuestion, totalQuestions);
+                showLetterToSoundQuiz();
+            }, 1500);
+        }
+
+        function checkTwoLetterAnswer(selected, correct) {
+            const buttons = document.querySelectorAll('#activityArea button');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            });
+            
+            const isCorrect = selected === correct;
+            saveAnswer(currentActivity, currentQuestion, selected, isCorrect);
+            
+            if (isCorrect) {
+                score++;
+                markah += 2;
+                playSound('correct');
+                showIslamicFeedback('Masya-Allah, jawapan betul! ✦', 'bg-green-500');
+            } else {
+                playSound('wrong');
+                showIslamicFeedback('Jangan putus asa! Cuba lagi! ☪', 'bg-red-500');
+            }
+            
+            saveActivityStatus(currentActivity, 'in_progress');
+            
+            setTimeout(() => {
+                currentQuestion++;
+                document.getElementById('questionCounter').textContent = `Soalan ${currentQuestion + 1} / ${totalQuestions}`;
+                updateProgress((currentQuestion / totalQuestions) * 100);
+                updateActivityProgress(currentQuestion, totalQuestions);
+                showTwoLetterToSoundQuiz();
+            }, 1500);
+        }
+
+        function checkThreeLetterAnswer(selected, correct) {
+            const buttons = document.querySelectorAll('#activityArea button');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            });
+            
+            const isCorrect = selected === correct;
+            saveAnswer(currentActivity, currentQuestion, selected, isCorrect);
+            
+            if (isCorrect) {
+                score++;
+                markah += 2;
+                playSound('correct');
+                showIslamicFeedback('Masya-Allah, jawapan betul! ✦', 'bg-green-500');
+            } else {
+                playSound('wrong');
+                showIslamicFeedback('Jangan putus asa! Cuba lagi! ☪', 'bg-red-500');
+            }
+            
+            saveActivityStatus(currentActivity, 'in_progress');
+            
+            setTimeout(() => {
+                currentQuestion++;
+                document.getElementById('questionCounter').textContent = `Soalan ${currentQuestion + 1} / ${totalQuestions}`;
+                updateProgress((currentQuestion / totalQuestions) * 100);
+                updateActivityProgress(currentQuestion, totalQuestions);
+                showThreeLetterToSoundQuiz();
+            }, 1500);
+        }
+
+        function showFeedback(message, bgClass) {
+            showIslamicFeedback(message, bgClass);
+        }
+
+        function showSoundToTwoLetterQuiz() {
+            if (currentQuestion >= totalQuestions) {
+                showQuizResults();
+                return;
+            }
+            
+            const letter1 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+            const letter2 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+            const correctAnswer = {
+                arabic: `${letter1.arabic} ${letter2.arabic}`,
+                rumi: `${letter1.rumi} ${letter2.rumi}`
+            };
+            
+            const options = [correctAnswer];
+            while (options.length < 4) {
+                const randLetter1 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+                const randLetter2 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+                const wrongOption = {
+                    arabic: `${randLetter1.arabic} ${randLetter2.arabic}`,
+                    rumi: `${randLetter1.rumi} ${randLetter2.rumi}`
+                };
+                
+                if (!options.find(opt => opt.arabic === wrongOption.arabic)) {
+                    options.push(wrongOption);
+                }
+            }
+            
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+            
+            document.getElementById('activityArea').innerHTML = `
+                <div class="text-center">
+                    <h3 class="text-base md:text-xl text-gray-800 mb-2 md:mb-4 bg-white/90 rounded-lg py-1 px-3 md:py-2 md:px-4 inline-block shadow-sm">Pilih huruf untuk bunyi:</h3>
+                    <br>
+                    <div class="text-2xl md:text-4xl text-gray-800 font-bold mb-6 md:mb-8 bg-white/90 rounded-lg py-2 px-4 inline-block shadow-md border border-gray-200">${correctAnswer.rumi}</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 max-w-2xl mx-auto px-2 md:px-0">
+                        ${options.map(option => `
+                            <button onclick="checkAnswer('${option.arabic}', '${correctAnswer.arabic}')" 
+                                    class="bg-white/90 hover:bg-white border-2 border-gray-200 text-gray-800 p-4 md:p-6 rounded-lg text-3xl md:text-4xl arabic-text transition-colors shadow-sm w-full">
+                                ${option.arabic}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function showTwoLetterToSoundQuiz() {
+            if (currentQuestion >= totalQuestions) {
+                showQuizResults();
+                return;
+            }
+            
+            const letter1 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+            const letter2 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+            const correctAnswer = {
+                arabic: `${letter1.arabic} ${letter2.arabic}`,
+                rumi: `${letter1.rumi} ${letter2.rumi}`
+            };
+            
+            const options = [correctAnswer];
+            while (options.length < 4) {
+                const randLetter1 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+                const randLetter2 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+                const wrongOption = {
+                    arabic: `${randLetter1.arabic} ${randLetter2.arabic}`,
+                    rumi: `${randLetter1.rumi} ${randLetter2.rumi}`
+                };
+                
+                if (!options.find(opt => opt.rumi === wrongOption.rumi)) {
+                    options.push(wrongOption);
+                }
+            }
+            
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+            
+            document.getElementById('activityArea').innerHTML = `
+                <div class="text-center">
+                    <h3 class="text-base md:text-xl text-gray-800 mb-2 md:mb-4 bg-white/90 rounded-lg py-1 px-3 md:py-2 md:px-4 inline-block shadow-sm">Pilih bunyi untuk huruf:</h3>
+                    <br>
+                    <div class="arabic-text text-4xl md:text-5xl mb-6 md:mb-8 bounce bg-white/90 rounded-lg py-3 px-5 md:py-4 md:px-6 inline-block shadow-md border border-gray-200">${correctAnswer.arabic}</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 max-w-2xl mx-auto px-2 md:px-0">
+                        ${options.map((option, index) => `
+                            <button id="option_${index}" onclick="playSound('click'); checkTwoLetterAnswer('${option.rumi.replace(/'/g, "\\'")}', '${correctAnswer.rumi.replace(/'/g, "\\'")}')" 
+                                    class="bg-white/90 hover:bg-white border-2 border-gray-200 text-gray-800 p-4 md:p-6 rounded-lg text-lg md:text-xl font-bold transition-colors cursor-pointer shadow-sm w-full">
+                                ${option.rumi}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function showSoundToThreeLetterQuiz() {
+            if (currentQuestion >= totalQuestions) {
+                showQuizResults();
+                return;
+            }
+            
+            const letter1 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+            const letter2 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+            const letter3 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+            const correctAnswer = {
+                arabic: `${letter1.arabic} ${letter2.arabic} ${letter3.arabic}`,
+                rumi: `${letter1.rumi} ${letter2.rumi} ${letter3.rumi}`
+            };
+            
+            const options = [correctAnswer];
+            while (options.length < 4) {
+                const randLetter1 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+                const randLetter2 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+                const randLetter3 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+                const wrongOption = {
+                    arabic: `${randLetter1.arabic} ${randLetter2.arabic} ${randLetter3.arabic}`,
+                    rumi: `${randLetter1.rumi} ${randLetter2.rumi} ${randLetter3.rumi}`
+                };
+                
+                if (!options.find(opt => opt.arabic === wrongOption.arabic)) {
+                    options.push(wrongOption);
+                }
+            }
+            
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+            
+            document.getElementById('activityArea').innerHTML = `
+                <div class="text-center">
+                    <h3 class="text-base md:text-xl text-gray-800 mb-2 md:mb-4 bg-white/90 rounded-lg py-1 px-3 md:py-2 md:px-4 inline-block shadow-sm">Pilih huruf untuk bunyi:</h3>
+                    <br>
+                    <div class="text-xl md:text-3xl text-gray-800 font-bold mb-6 md:mb-8 bg-white/90 rounded-lg py-2 px-4 inline-block shadow-md border border-gray-200">${correctAnswer.rumi}</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 max-w-3xl mx-auto px-2 md:px-0">
+                        ${options.map(option => `
+                            <button onclick="checkAnswer('${option.arabic}', '${correctAnswer.arabic}')" 
+                                    class="bg-white/90 hover:bg-white border-2 border-gray-200 text-gray-800 p-4 md:p-6 rounded-lg text-2xl md:text-3xl arabic-text transition-colors shadow-sm w-full">
+                                ${option.arabic}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function showThreeLetterToSoundQuiz() {
+            if (currentQuestion >= totalQuestions) {
+                showQuizResults();
+                return;
+            }
+            
+            const letter1 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+            const letter2 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+            const letter3 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+            const correctAnswer = {
+                arabic: `${letter1.arabic} ${letter2.arabic} ${letter3.arabic}`,
+                rumi: `${letter1.rumi} ${letter2.rumi} ${letter3.rumi}`
+            };
+            
+            const options = [correctAnswer];
+            while (options.length < 4) {
+                const randLetter1 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+                const randLetter2 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+                const randLetter3 = hijaiyyahLetters[Math.floor(Math.random() * hijaiyyahLetters.length)];
+                const wrongOption = {
+                    arabic: `${randLetter1.arabic} ${randLetter2.arabic} ${randLetter3.arabic}`,
+                    rumi: `${randLetter1.rumi} ${randLetter2.rumi} ${randLetter3.rumi}`
+                };
+                
+                if (!options.find(opt => opt.rumi === wrongOption.rumi)) {
+                    options.push(wrongOption);
+                }
+            }
+            
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+            
+            document.getElementById('activityArea').innerHTML = `
+                <div class="text-center">
+                    <h3 class="text-base md:text-xl text-gray-800 mb-2 md:mb-4 bg-white/90 rounded-lg py-1 px-3 md:py-2 md:px-4 inline-block shadow-sm">Pilih bunyi untuk huruf:</h3>
+                    <br>
+                    <div class="arabic-text text-3xl md:text-5xl mb-6 md:mb-8 bounce bg-white/90 rounded-lg py-3 px-5 md:py-4 md:px-6 inline-block shadow-md border border-gray-200">${correctAnswer.arabic}</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 max-w-3xl mx-auto px-2 md:px-0">
+                        ${options.map((option, index) => `
+                            <button id="option_${index}" onclick="playSound('click'); checkThreeLetterAnswer('${option.rumi.replace(/'/g, "\\'")}', '${correctAnswer.rumi.replace(/'/g, "\\'")}')" 
+                                    class="bg-white/90 hover:bg-white border-2 border-gray-200 text-gray-800 p-3 md:p-5 rounded-lg text-base md:text-lg font-bold transition-colors cursor-pointer shadow-sm w-full">
+                                ${option.rumi}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+
+
+        function showDragDropQuiz() {
+            if (currentQuestion >= totalQuestions) {
+                showQuizResults();
+                return;
+            }
+            
+            currentDragQuestion = susunList[Math.floor(Math.random() * susunList.length)];
+            dropTargets = ['', '', '']; 
+            
+            const shuffledLetters = [...currentDragQuestion.hurufList];
+            for (let i = shuffledLetters.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledLetters[i], shuffledLetters[j]] = [shuffledLetters[j], shuffledLetters[i]];
+            }
+            
+            document.getElementById('activityArea').innerHTML = `
+                <div class="flex flex-col items-center justify-center text-center space-y-4 md:space-y-8 px-2">
+                    <div class="bg-white/90 rounded-2xl p-4 md:p-8 shadow-lg border-2 border-pastel-pink w-full max-w-lg">
+                        <h3 class="text-xl md:text-2xl font-bold mb-2 md:mb-4 text-gray-800">🌙 Susun huruf ✨</h3>
+                        <div class="rumi-text text-3xl md:text-5xl font-bold mb-2" style="color: #FF69B4;">${currentDragQuestion.bunyi}</div>
+                    </div>
+                    
+                    <div class="flex justify-center gap-3 md:gap-6 mb-4 md:mb-8 w-full max-w-lg flex-row-reverse">
+                        ${[2, 1, 0].map(index => `
+                            <div id="dropTarget${index}" 
+                                 class="drop-target w-[30%] aspect-square max-w-[96px] rounded-xl md:rounded-2xl flex items-center justify-center text-3xl md:text-5xl arabic-text shadow-sm"
+                                 ondrop="drop(event, ${index})" 
+                                 ondragover="allowDrop(event)"
+                                 ondragenter="dragEnter(event)"
+                                 ondragleave="dragLeave(event)">
+                                <span id="dropped${index}" class="text-gray-800 pointer-events-none"></span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="flex justify-center gap-3 md:gap-6 mb-4 md:mb-8 w-full max-w-lg">
+                        ${shuffledLetters.map((letter, index) => `
+                            <div id="drag${index}" 
+                                 class="draggable-letter w-[30%] aspect-square max-w-[96px] rounded-xl md:rounded-2xl flex items-center justify-center text-3xl md:text-5xl arabic-text text-gray-800 cursor-move shadow-md"
+                                 draggable="true" 
+                                 ondragstart="drag(event, '${letter}')"
+                                 data-letter="${letter}">
+                                ${letter}
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div id="dragFeedback" class="text-xl md:text-3xl font-bold mb-2 md:mb-6 min-h-[3rem] flex items-center justify-center"></div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3 md:gap-4 w-full justify-center">
+                        <button id="checkDragAnswer" onclick="playSound('click'); checkDragAnswer()" 
+                                class="w-full sm:w-auto answer-btn bg-green-500 hover:bg-green-600 text-white px-6 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl text-lg md:text-xl font-bold transition-all opacity-50 cursor-not-allowed" 
+                                disabled>
+                            ✅ Semak
+                        </button>
+                        <button id="nextDragQuestion" onclick="playSound('click'); nextDragQuestion()" 
+                                class="w-full sm:w-auto answer-btn bg-blue-500 hover:bg-blue-600 text-white px-6 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl text-lg md:text-xl font-bold transition-all hidden">
+                            ${currentQuestion < totalQuestions - 1 ? '🌙 Seterusnya' : '✨ Selesai ✦'}
+                        </button>
+                        <button onclick="playSound('click'); resetDragQuestion()" 
+                                class="w-full sm:w-auto answer-btn bg-yellow-500 hover:bg-yellow-600 text-white px-6 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl text-lg md:text-xl font-bold transition-all">
+                            🔄 Mula Semula
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Keep drag and drop core functions unchanged
+        function allowDrop(ev) { ev.preventDefault(); }
+        function dragEnter(ev) { ev.preventDefault(); ev.target.classList.add('drag-over'); }
+        function dragLeave(ev) { ev.target.classList.remove('drag-over'); }
+
+        function drag(ev, letter) {
+            ev.dataTransfer.setData("text", letter);
+            draggedElement = ev.target;
+            playSound('click');
+        }
+
+        function drop(ev, targetIndex) {
+            ev.preventDefault();
+            const letter = ev.dataTransfer.getData("text");
+            const target = ev.target.closest('.drop-target');
+            
+            target.classList.remove('drag-over');
+            
+            if (dropTargets[targetIndex] !== '') return;
+            
+            playSound('correct');
+            dropTargets[targetIndex] = letter;
+            document.getElementById(`dropped${targetIndex}`).textContent = letter;
+            
+            if (draggedElement) {
+                draggedElement.style.opacity = '0';
+                draggedElement.setAttribute('draggable', 'false');
+            }
+            
+            target.classList.add('drop-success');
+            
+            if (dropTargets.every(t => t !== '')) {
+                const checkButton = document.getElementById('checkDragAnswer');
+                checkButton.disabled = false;
+                checkButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                checkButton.classList.add('animate-pulse');
+            }
+        }
+
+        function checkDragAnswer() {
+            // Check right to left
+            const isCorrect = dropTargets[0] === currentDragQuestion.hurufList[2] &&
+                             dropTargets[1] === currentDragQuestion.hurufList[1] &&
+                             dropTargets[2] === currentDragQuestion.hurufList[0];
+            
+            if (isCorrect) {
+                score++;
+                markah += 2;
+                playSound('correct');
+                document.getElementById('dragFeedback').innerHTML = '<span class="text-green-500">✅ Betul!</span>';
+            } else {
+                playSound('wrong');
+                const correctOrder = [currentDragQuestion.hurufList[2], currentDragQuestion.hurufList[1], currentDragQuestion.hurufList[0]];
+                document.getElementById('dragFeedback').innerHTML = `
+                    <div class="text-sm md:text-xl">
+                        <span class="text-red-500">❌ Salah.</span><br>
+                        <span class="text-orange-500 font-normal">Jawapan: <span class="arabic-text">${correctOrder.join(' ')}</span></span>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('checkDragAnswer').style.display = 'none';
+            document.getElementById('nextDragQuestion').classList.remove('hidden');
+        }
+
+        function nextDragQuestion() {
+            currentQuestion++;
+            if(currentQuestion >= totalQuestions) {
+                showQuizResults();
+                return;
+            }
+            document.getElementById('questionCounter').textContent = `Soalan ${currentQuestion + 1} / ${totalQuestions}`;
+            updateProgress((currentQuestion / totalQuestions) * 100);
+            updateActivityProgress(currentQuestion, totalQuestions);
+            showDragDropQuiz();
+        }
+
+        function resetDragQuestion() {
+            dropTargets = ['', '', ''];
+            
+            for (let i = 0; i < 3; i++) {
+                document.getElementById(`dropped${i}`).textContent = '';
+                const target = document.getElementById(`dropTarget${i}`);
+                target.classList.remove('drop-success');
+            }
+            
+            const draggableLetters = document.querySelectorAll('.draggable-letter');
+            draggableLetters.forEach(letter => {
+                letter.style.opacity = '1';
+                letter.setAttribute('draggable', 'true');
+            });
+            
+            const checkButton = document.getElementById('checkDragAnswer');
+            checkButton.disabled = true;
+            checkButton.classList.add('opacity-50', 'cursor-not-allowed');
+            checkButton.classList.remove('animate-pulse');
+            checkButton.style.display = 'inline-block';
+            
+            document.getElementById('nextDragQuestion').classList.add('hidden');
+            document.getElementById('dragFeedback').innerHTML = '';
+        }
+
+        function showCardMatchingGame() {
+            if (currentQuestion >= totalQuestions) {
+                showQuizResults();
+                return;
+            }
+            
+            currentCardSet = kadPadananList[Math.floor(Math.random() * kadPadananList.length)];
+            let cards = [];
+            currentCardSet.forEach((pair, index) => {
+                cards.push({ id: `huruf_${index}`, type: 'huruf', content: pair.huruf, pair: index });
+                cards.push({ id: `bunyi_${index}`, type: 'bunyi', content: pair.bunyi, pair: index });
+            });
+            
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+            
+            flippedCards = [];
+            matchedPairs = 0;
+            canFlip = true;
+            
+            document.getElementById('activityArea').innerHTML = `
+                <div class="flex flex-col items-center justify-center text-center space-y-4 md:space-y-6">
+                    <div class="bg-white/90 rounded-2xl p-4 md:p-6 shadow-md border border-pastel-pink w-full max-w-lg">
+                        <h3 class="text-xl md:text-2xl font-bold mb-2 text-gray-800">🎯 Cari Padanan Kad</h3>
+                        <p class="text-sm md:text-base text-gray-600 mb-2">🌙 Klik untuk cari padanan ✨</p>
+                        <div id="gameStatus" class="text-lg md:text-xl font-bold text-pink-500">
+                            Dijumpai: <span id="matchCount">0</span>/3
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-3 md:gap-6 max-w-lg mx-auto w-full px-2">
+                        ${cards.map(card => `
+                            <div id="card_${card.id}" 
+                                 class="card aspect-square bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 rounded-xl md:rounded-2xl flex items-center justify-center cursor-pointer transition-all transform hover:scale-105 relative shadow-md"
+                                 onclick="flipCard('${card.id}', '${card.type}', '${card.content.replace(/'/g, "\\'")}', ${card.pair})"
+                                 data-flipped="false"
+                                 data-matched="false"
+                                 data-type="${card.type}"
+                                 data-content="${card.content.replace(/"/g, '&quot;')}"
+                                 data-pair="${card.pair}">
+                                <div class="card-back text-white text-2xl md:text-3xl font-bold flex items-center justify-center w-full h-full">🌙</div>
+                                <div class="card-front hidden text-gray-800 ${card.type === 'huruf' ? 'text-3xl md:text-4xl arabic-text' : 'text-base md:text-xl font-bold rumi-text'} flex items-center justify-center w-full h-full bg-gradient-to-br from-white to-gray-100 rounded-xl md:rounded-2xl p-2 break-all text-center">
+                                    ${card.content}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div id="cardFeedback" class="text-xl md:text-2xl font-bold min-h-[2.5rem] flex items-center justify-center"></div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3 md:gap-4 w-full justify-center px-4">
+                        <button id="nextCardGame" onclick="playSound('click'); nextCardGame()" 
+                                class="w-full sm:w-auto answer-btn bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl md:rounded-2xl text-base md:text-lg font-bold transition-all hidden">
+                            ${currentQuestion < totalQuestions - 1 ? '🌙 Seterusnya' : '✨ Selesai ✦'}
+                        </button>
+                        <button onclick="playSound('click'); resetCardGame()" 
+                                class="w-full sm:w-auto answer-btn bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-xl md:rounded-2xl text-base md:text-lg font-bold transition-all">
+                            🔄 Mula Semula
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Keep card logic unchanged
+        function flipCard(cardId, type, content, pairIndex) {
+            if (!canFlip) return;
+            const cardElement = document.getElementById(`card_${cardId}`);
+            if (!cardElement || cardElement.dataset.flipped === 'true' || cardElement.dataset.matched === 'true') return;
+            
+            playSound('click');
+            cardElement.classList.add('card-flip');
+            cardElement.dataset.flipped = 'true';
+            
+            const cardBack = cardElement.querySelector('.card-back');
+            const cardFront = cardElement.querySelector('.card-front');
+            
+            if (cardBack && cardFront) {
+                setTimeout(() => {
+                    cardBack.style.display = 'none';
+                    cardFront.style.display = 'flex';
+                    cardFront.classList.remove('hidden');
+                }, 300);
+            }
+            
+            cardElement.classList.remove('from-blue-400', 'to-blue-600');
+            cardElement.classList.add('from-green-400', 'to-green-600');
+            
+            flippedCards.push({ id: cardId, type: type, content: content, pair: pairIndex, element: cardElement });
+            
+            if (flippedCards.length === 2) {
+                canFlip = false;
+                setTimeout(checkCardMatch, 800);
+            }
+        }
+
+        function checkCardMatch() {
+            const [card1, card2] = flippedCards;
+            
+            if (card1.pair === card2.pair && card1.type !== card2.type) {
+                playSound('correct');
+                card1.element.dataset.matched = 'true';
+                card2.element.dataset.matched = 'true';
+                
+                card1.element.classList.replace('from-green-400', 'from-yellow-300');
+                card1.element.classList.replace('to-green-600', 'to-yellow-500');
+                card2.element.classList.replace('from-green-400', 'from-yellow-300');
+                card2.element.classList.replace('to-green-600', 'to-yellow-500');
+                card1.element.classList.add('border-2', 'border-yellow-600');
+                card2.element.classList.add('border-2', 'border-yellow-600');
+                
+                matchedPairs++;
+                document.getElementById('matchCount').textContent = matchedPairs;
+                
+                if (matchedPairs === 3) {
+                    score++;
+                    markah += 2;
+                    playSound('complete');
+                    document.getElementById('cardFeedback').innerHTML = '<span class="text-green-500 text-sm md:text-xl">🎉 Tahniah! Selesai! ✨</span>';
+                    document.getElementById('nextCardGame').classList.remove('hidden');
+                } else {
+                    document.getElementById('cardFeedback').innerHTML = '<span class="text-green-500 text-sm md:text-xl">✅ Padanan betul! 🌙</span>';
+                    setTimeout(() => document.getElementById('cardFeedback').innerHTML = '', 1500);
+                }
+                flippedCards = [];
+                canFlip = true;
+            } else {
+                playSound('wrong');
+                document.getElementById('cardFeedback').innerHTML = '<span class="text-red-500 text-sm md:text-xl">❌ Tidak sepadan</span>';
+                
+                setTimeout(() => {
+                    card1.element.dataset.flipped = 'false';
+                    card2.element.dataset.flipped = 'false';
+                    
+                    const resetC = (el) => {
+                        const cb = el.querySelector('.card-back');
+                        const cf = el.querySelector('.card-front');
+                        if (cb && cf) {
+                            cb.style.display = 'flex';
+                            cf.style.display = 'none';
+                            cb.classList.remove('hidden');
+                            cf.classList.add('hidden');
+                        }
+                    };
+                    resetC(card1.element);
+                    resetC(card2.element);
+                    
+                    card1.element.classList.replace('from-green-400', 'from-blue-400');
+                    card1.element.classList.replace('to-green-600', 'to-blue-600');
+                    card2.element.classList.replace('from-green-400', 'from-blue-400');
+                    card2.element.classList.replace('to-green-600', 'to-blue-600');
+                    
+                    document.getElementById('cardFeedback').innerHTML = '';
+                    flippedCards = [];
+                    canFlip = true;
+                }, 1000);
+            }
+        }
+
+        function nextCardGame() {
+            currentQuestion++;
+            if(currentQuestion >= totalQuestions) {
+                showQuizResults();
+                return;
+            }
+            document.getElementById('questionCounter').textContent = `Soalan ${currentQuestion + 1} / ${totalQuestions}`;
+            updateProgress((currentQuestion / totalQuestions) * 100);
+            updateActivityProgress(currentQuestion, totalQuestions);
+            showCardMatchingGame();
+        }
+
+        function resetCardGame() { showCardMatchingGame(); }
+
+        function show30SecondChallenge() {
+            timeLeft = 30;
+            challengeScore = 0;
+            markah = 0;
+            usedQuestions = [];
+            currentChallengeQuestion = null;
+            
+            if (challengeTimer) clearInterval(challengeTimer);
+            
+            document.getElementById('questionCounter').textContent = '⏱ 30 Saat!';
+            
+            document.getElementById('activityArea').innerHTML = `
+                <div class="flex flex-col items-center justify-center text-center space-y-6 md:space-y-8">
+                    <div class="bg-white/90 rounded-2xl p-6 md:p-8 shadow-md border-2 border-red-400 w-full max-w-lg">
+                        <h2 class="text-2xl md:text-4xl font-bold mb-2 md:mb-4 text-gray-800">⏱ Cabaran 30 Saat!</h2>
+                        <p class="text-sm md:text-xl text-gray-600">🌙 Jawab sebanyak mungkin soalan ✨</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-red-100 to-red-200 rounded-2xl p-6 md:p-12 w-full max-w-lg mx-auto shadow-md border border-red-300">
+                        <div class="timer-display text-7xl md:text-8xl font-bold mb-4 md:mb-6 text-red-500" id="timerDisplay">30</div>
+                        <p class="text-xl md:text-2xl font-bold mb-6 md:mb-8 text-gray-800">⏰ Masa</p>
+                        
+                        <button onclick="playSound('click'); startChallenge()" 
+                                class="w-full answer-btn bg-green-500 hover:bg-green-600 text-white py-4 md:py-6 rounded-xl md:rounded-2xl text-xl md:text-3xl font-bold transition-all transform hover:scale-105 shadow-md">
+                            🚀 MULA!
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startChallenge() {
+            challengeTimer = setInterval(() => {
+                timeLeft--;
+                const timerEl = document.getElementById('timerDisplay');
+                timerEl.textContent = timeLeft;
+                
+                if (timeLeft <= 10) {
+                    timerEl.classList.add('text-red-600', 'animate-pulse');
+                } else if (timeLeft <= 20) {
+                    timerEl.classList.remove('text-red-500');
+                    timerEl.classList.add('text-orange-500');
+                }
+                
+                if (timeLeft <= 0) endChallenge();
+            }, 1000);
+            
+            showNextChallengeQuestion();
+        }
+
+        function showNextChallengeQuestion() {
+            let availableQuestions = soalanPantas.filter((_, index) => !usedQuestions.includes(index));
+            if (availableQuestions.length === 0) {
+                usedQuestions = [];
+                availableQuestions = soalanPantas;
+            }
+            
+            const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+            currentChallengeQuestion = availableQuestions[randomIndex];
+            usedQuestions.push(soalanPantas.indexOf(currentChallengeQuestion));
+            
+            const shuffledChoices = [...currentChallengeQuestion.pilihan];
+            for (let i = shuffledChoices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledChoices[i], shuffledChoices[j]] = [shuffledChoices[j], shuffledChoices[i]];
+            }
+            
+            document.getElementById('activityArea').innerHTML = `
+                <div class="flex flex-col items-center justify-center text-center space-y-4 md:space-y-6 w-full">
+                    <div class="flex justify-between items-center w-full max-w-2xl px-2">
+                        <div class="bg-white/90 rounded-xl px-4 py-2 shadow-sm border border-red-300">
+                            <div class="text-sm md:text-xl font-bold text-gray-800">⏱ Cabaran</div>
+                        </div>
+                        <div class="bg-red-100 rounded-xl px-4 py-2 shadow-sm border border-red-300">
+                            <div class="timer-display text-2xl md:text-4xl font-bold ${timeLeft <= 10 ? 'text-red-600 timer-warning' : 'text-red-500'}" id="timerDisplay">${timeLeft}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white/90 rounded-2xl p-4 md:p-8 w-full max-w-2xl mx-auto shadow-md border border-gray-200">
+                        <h3 class="text-lg md:text-2xl font-bold mb-4 md:mb-8 text-gray-800">${currentChallengeQuestion.soalan}</h3>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 px-2">
+                            ${shuffledChoices.map((pilihan, index) => `
+                                <button onclick="playSound('click'); answerChallenge('${pilihan.replace(/'/g, "\\'")}', this)" 
+                                        class="answer-btn bg-blue-50 hover:bg-blue-100 border-2 border-blue-200 text-gray-800 py-4 md:py-6 rounded-xl text-base md:text-xl font-bold transition-all cursor-pointer ${pilihan.includes('َ') ? 'arabic-text text-3xl md:text-4xl' : 'rumi-text'}">
+                                    ${pilihan}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white/90 rounded-full px-6 py-2 shadow-sm border border-green-300">
+                        <div class="text-lg md:text-2xl font-bold text-green-600">
+                            🌙 Skor: ${challengeScore} ✨
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function answerChallenge(selectedAnswer, buttonElement) {
+            const buttons = document.querySelectorAll('#activityArea button');
+            buttons.forEach(btn => btn.disabled = true);
+            
+            const isCorrect = selectedAnswer === currentChallengeQuestion.jawapan;
+            saveAnswer(currentActivity, usedQuestions.length - 1, selectedAnswer, isCorrect);
+            
+            if (isCorrect) {
+                challengeScore++;
+                markah += 1;
+                playSound('correct');
+                buttonElement.classList.replace('bg-blue-50', 'bg-green-200');
+                buttonElement.classList.replace('border-blue-200', 'border-green-400');
+            } else {
+                playSound('wrong');
+                buttonElement.classList.replace('bg-blue-50', 'bg-red-200');
+                buttonElement.classList.replace('border-blue-200', 'border-red-400');
+            }
+            
+            saveActivityStatus(currentActivity, 'in_progress');
+            
+            setTimeout(() => {
+                if (timeLeft > 0) showNextChallengeQuestion();
+            }, 500);
+        }
+
+        function endChallenge() {
+            if (challengeTimer) {
+                clearInterval(challengeTimer);
+                challengeTimer = null;
+            }
+            
+            markActivityCompleted(currentActivity);
+            saveActivityStatus(currentActivity, 'completed');
+            
+            const total = challengeScore + (usedQuestions.length - challengeScore); 
+            const percentage = total > 0 ? Math.round((challengeScore / total) * 100) : 0;
+            const gelaran = getGelaran(percentage);
+            
+            playSound('complete');
+            
+            document.getElementById('activityArea').innerHTML = `
+                <div class="text-center w-full px-2">
+                    <div class="text-5xl md:text-6xl mb-4">${gelaran.title.split(' ')[0]}</div>
+                    <h2 class="text-xl md:text-3xl text-gray-800 font-bold mb-6 bg-white/90 rounded-lg py-2 px-4 inline-block shadow-sm">⏰ Masa Tamat!</h2>
+                    
+                    <div class="bg-white/90 rounded-2xl p-6 md:p-8 max-w-lg mx-auto mb-6 md:mb-8 shadow-md border border-gray-200">
+                        <div class="text-xl md:text-3xl font-bold mb-4 ${gelaran.color}">${gelaran.title}</div>
+                        
+                        <div class="grid grid-cols-2 gap-3 md:gap-4 mb-4">
+                            <div class="bg-green-50 rounded-lg p-3 md:p-4 border-2 border-green-200">
+                                <div class="text-2xl md:text-3xl font-bold text-green-600">${challengeScore}</div>
+                                <div class="text-xs md:text-sm text-gray-600 font-bold mt-1">Betul</div>
+                            </div>
+                            <div class="bg-red-50 rounded-lg p-3 md:p-4 border-2 border-red-200">
+                                <div class="text-2xl md:text-3xl font-bold text-red-600">${usedQuestions.length - challengeScore}</div>
+                                <div class="text-xs md:text-sm text-gray-600 font-bold mt-1">Salah</div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-sm md:text-lg text-gray-800 mb-1 font-semibold">Ketepatan: ${percentage}%</div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row justify-center gap-3 w-full max-w-md mx-auto">
+                        <button onclick="playSound('click'); show30SecondChallenge()" 
+                                class="w-full sm:w-1/2 bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg text-lg md:text-xl font-bold shadow-md">
+                            🔄 Main Lagi
+                        </button>
+                        <button onclick="playSound('click'); goBackToPhase()" 
+                                class="w-full sm:w-1/2 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg text-lg md:text-xl font-bold shadow-md">
+                            ✅ Selesai & Kembali
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            updateProgress(100);
+            updateActivityProgress(1, 1); // visually full
+        }
+
+        // TERTENTU: Paparan ini ditukar tajuk butang kepada 'Selesai & Kembali' untuk kuiz
+        function showQuizResults() {
+            const percentage = Math.round((score / totalQuestions) * 100); 
+            const gelaran = getGelaran(percentage);
+            
+            markActivityCompleted(currentActivity);
+            saveActivityStatus(currentActivity, 'completed');
+            
+            document.getElementById('activityArea').innerHTML = `
+                <div class="text-center px-2">
+                    <div class="text-6xl md:text-7xl mb-4">${gelaran.title.split(' ')[0]}</div>
+                    <h3 class="text-2xl md:text-4xl text-gray-800 font-bold mb-6">Tamat!</h3>
+                    
+                    <div class="bg-white/90 rounded-2xl p-6 md:p-8 max-w-md mx-auto mb-6 shadow-md border border-gray-200">
+                        <div class="text-2xl md:text-3xl font-bold mb-4 ${gelaran.color}">${gelaran.title}</div>
+                        <div class="text-xl md:text-2xl text-gray-800 font-bold mb-2">Markah: ${score}/${totalQuestions}</div>
+                        <div class="text-lg md:text-xl text-gray-600">Ketepatan: ${percentage}%</div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row justify-center gap-3 w-full max-w-md mx-auto">
+                        <button onclick="startActivity('${currentActivity}')" class="w-full sm:w-1/2 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-bold text-base md:text-lg shadow">
+                            🔄 Cuba Lagi
+                        </button>
+                        <button onclick="goBackToPhase()" class="w-full sm:w-1/2 bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-bold text-base md:text-lg shadow">
+                            ✅ Selesai & Kembali
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showFinalAssessment() {
+            currentActivity = 'final';
+            currentQuestion = 0;
+            score = 0;
+            markah = 0;
+            totalQuestions = 20;
+            
+            finalAssessmentQuestions = [...penilaianList];
+            for (let i = finalAssessmentQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [finalAssessmentQuestions[i], finalAssessmentQuestions[j]] = [finalAssessmentQuestions[j], finalAssessmentQuestions[i]];
+            }
+            finalAssessmentQuestions = finalAssessmentQuestions.slice(0, 20);
+            
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('phaseMenu').classList.add('hidden');
+            document.getElementById('activityContent').classList.remove('hidden');
+            document.getElementById('leaderboardPage').classList.add('hidden');
+            
+            document.getElementById('questionCounter').textContent = `Soalan ${currentQuestion + 1} / ${totalQuestions}`;
+            
+            showFinalAssessmentQuestion();
+        }
+
+        function showFinalAssessmentQuestion() {
+            if (currentQuestion >= totalQuestions) {
+                showFinalAssessmentResults();
+                return;
+            }
+            
+            currentFinalQuestion = finalAssessmentQuestions[currentQuestion];
+            const shuffledChoices = [...currentFinalQuestion.pilihan];
+            for (let i = shuffledChoices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledChoices[i], shuffledChoices[j]] = [shuffledChoices[j], shuffledChoices[i]];
+            }
+            
+            document.getElementById('activityArea').innerHTML = `
+                <div class="text-center w-full px-2">
+                    <div class="bg-purple-100 rounded-xl p-4 md:p-6 mb-4 md:mb-6 shadow-sm border border-purple-200">
+                        <h2 class="text-xl md:text-2xl text-purple-800 font-bold mb-2">🟪 Penilaian Akhir</h2>
+                        <div class="text-sm md:text-base text-gray-700 font-semibold bg-white/60 rounded-md py-1 px-3 inline-block">
+                            Soalan ${currentQuestion + 1} / ${totalQuestions}
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white/90 rounded-2xl p-4 md:p-8 w-full max-w-2xl mx-auto mb-6 shadow-md border border-gray-200">
+                        <h3 class="text-lg md:text-2xl text-gray-800 font-bold mb-6 md:mb-8">${currentFinalQuestion.soalan}</h3>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                            ${shuffledChoices.map(pilihan => `
+                                <button onclick="checkFinalAnswer(\`${pilihan}\`)" 
+                                        class="bg-purple-50 hover:bg-purple-100 border-2 border-purple-200 text-gray-800 p-4 md:p-6 rounded-xl font-bold transition-all cursor-pointer ${pilihan.includes('َ') ? 'arabic-text text-3xl md:text-4xl' : 'rumi-text text-lg md:text-xl'}">
+                                    ${pilihan}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="text-sm md:text-lg text-gray-600 font-bold">
+                        Betul: ${score}/${currentQuestion}
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkFinalAnswer(selected) {
+            const buttons = document.querySelectorAll('#activityArea button');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            });
+            
+            const isCorrect = selected === currentFinalQuestion.jawapan;
+            saveAnswer('final', currentQuestion, selected, isCorrect);
+            
+            if (isCorrect) {
+                score++;
+                markah += 5; // 5 marks each (total 100)
+                playSound('correct');
+                showFeedback('Betul! 🎉', 'bg-green-500');
+            } else {
+                playSound('wrong');
+                showFeedback(`Salah. Jawapan: ${currentFinalQuestion.jawapan}`, 'bg-red-500');
+            }
+            
+            saveActivityStatus('final', 'in_progress');
+            
+            setTimeout(() => {
+                currentQuestion++;
+                document.getElementById('questionCounter').textContent = `Soalan ${currentQuestion + 1} / ${totalQuestions}`;
+                updateProgress((currentQuestion / totalQuestions) * 100);
+                updateActivityProgress(currentQuestion, totalQuestions);
+                showFinalAssessmentQuestion();
+            }, 2000);
+        }
+
+        function showFinalAssessmentResults() {
+            playSound('complete');
+            processFinalResults();
+        }
+
+        async function processFinalResults() {
+            const gelaran = getGelaran(markah);
+            saveActivityStatus('final', 'completed');
+            
+            const userData = {
+                nama: studentNama,
+                umur: studentUmur,
+                negeri: studentNegeri,
+                markah: markah,
+                gelaran: gelaran.title,
+                timestamp: new Date().toISOString()
+            };
+            
+            const saved = await window.saveToFirebase(userData);
+            showFinalResultsDisplay(gelaran, saved);
+        }
+
+        function showFinalResultsDisplay(gelaran, firebaseSaved) {
+            const layakSijil = markah >= 80;
+            
+            const certificateSection = layakSijil ? `
+                <div class="bg-gradient-to-r from-yellow-100 to-yellow-200 rounded-xl p-4 md:p-6 w-full max-w-lg mx-auto mb-6 border-2 border-yellow-400 shadow-md">
+                    <div class="text-3xl md:text-4xl mb-2">🏆</div>
+                    <p class="text-lg md:text-xl text-yellow-800 font-bold mb-2">✅ LAYAK SIJIL</p>
+                    <p class="text-xs md:text-sm text-yellow-700">Anda telah menguasai Iqra' 1!</p>
+                </div>
+            ` : `
+                <div class="bg-gradient-to-r from-red-50 to-red-100 rounded-xl p-4 md:p-6 w-full max-w-lg mx-auto mb-6 border-2 border-red-300 shadow-sm">
+                    <div class="text-3xl md:text-4xl mb-2">📚</div>
+                    <p class="text-lg md:text-xl text-red-700 font-bold mb-2">❌ BELUM LAYAK SIJIL</p>
+                    <p class="text-xs md:text-sm text-red-600">Perlu markah 80 ke atas. Cuba lagi!</p>
+                </div>
+            `;
+            
+            document.getElementById('activityArea').innerHTML = `
+                <div class="text-center px-2">
+                    <h2 class="text-2xl md:text-4xl text-gray-800 font-bold mb-4 md:mb-6">Keputusan Akhir</h2>
+                    
+                    <div class="bg-white/90 rounded-2xl p-6 md:p-8 max-w-lg mx-auto mb-6 shadow-lg border border-gray-200">
+                        <div class="text-5xl md:text-6xl mb-4">${gelaran.title.split(' ')[0]}</div>
+                        <div class="text-2xl md:text-3xl font-bold mb-4 ${gelaran.color}">${gelaran.title}</div>
+                        <div class="text-4xl md:text-6xl text-gray-800 font-bold mb-4">${markah}<span class="text-2xl md:text-4xl text-gray-500">/100</span></div>
+                        
+                        <div class="flex justify-center gap-4 mb-4 text-sm md:text-base">
+                            <div class="bg-green-50 px-4 py-2 rounded border border-green-200">
+                                <span class="font-bold text-green-600">${score}</span> Betul
+                            </div>
+                            <div class="bg-red-50 px-4 py-2 rounded border border-red-200">
+                                <span class="font-bold text-red-600">${totalQuestions - score}</span> Salah
+                            </div>
+                        </div>
+                        
+                        <div class="text-xs md:text-sm ${firebaseSaved ? 'text-green-600' : 'text-red-500'}">
+                            ${firebaseSaved ? '✅ Direkod dalam pelayan' : '❌ Gagal simpan ke pelayan'}
+                        </div>
+                    </div>
+                    
+                    ${certificateSection}
+                    
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center w-full max-w-md mx-auto mt-6 md:mt-8">
+                        ${layakSijil ? `
+                        <button onclick="showCertificate()" 
+                                class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 rounded-lg text-base md:text-xl font-bold shadow-md transition-all">
+                            📜 Papar Sijil
+                        </button>
+                        ` : ''}
+                        <button onclick="showFinalAssessment()" 
+                                class="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-lg text-base md:text-xl font-bold shadow-md transition-all">
+                            🔄 Cuba Lagi
+                        </button>
+                        <button onclick="showMainMenu()" 
+                                class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg text-base md:text-xl font-bold shadow-md transition-all">
+                            🏠 Kembali Menu Utama
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showCertificate() {
+            const currentDate = new Date().toLocaleDateString('ms-MY', {
+                day: 'numeric', month: 'long', year: 'numeric'
+            });
+            const gelaran = getGelaran(markah);
+            
+            // Adjust scale on mobile to fit screen
+            document.getElementById('activityArea').innerHTML = `
+                <div class="text-center pb-4">
+                    <div class="w-full overflow-x-auto pb-4 pt-2">
+                        <div id="certificateContainer" class="bg-gradient-to-br from-yellow-50 to-white border-[6px] md:border-[10px] border-yellow-600 rounded-xl md:rounded-2xl p-6 md:p-12 shadow-md w-[800px] md:w-[900px] max-w-none mx-auto relative" style="background: linear-gradient(135deg, #FFF8DC 0%, #F0E68C 100%); min-height: 500px;">
+                            
+                            <div class="border-[3px] border-double border-yellow-700 absolute inset-2 md:inset-4 rounded-lg pointer-events-none"></div>
+
+                            <div class="flex justify-center items-center mb-6 mt-4">
+                                <div class="text-4xl md:text-5xl text-yellow-600 mx-4">☪</div>
+                                <div class="text-center">
+                                    <h1 class="text-3xl md:text-5xl font-extrabold text-yellow-800 tracking-wide mb-1">SIJIL PENCAPAIAN</h1>
+                                    <p class="text-base md:text-xl text-yellow-700 font-medium">Fatha-X: Eksplorasi Huruf & Bunyi Fathah</p>
+                                </div>
+                                <div class="text-4xl md:text-5xl text-yellow-600 mx-4">✦</div>
+                            </div>
+                            
+                            <div class="py-6 md:py-8 my-4 relative">
+                                <div class="absolute inset-x-10 top-0 border-t-2 border-dashed border-yellow-600 opacity-50"></div>
+                                <div class="text-center">
+                                    <p class="text-lg md:text-2xl text-yellow-800 mb-4 italic">Dengan ini disahkan bahawa</p>
+                                    <h2 class="text-4xl md:text-6xl font-bold text-gray-800 mb-4 tracking-wider uppercase" style="font-family: 'Times New Roman', serif;">${studentNama}</h2>
+                                    <p class="text-sm md:text-lg text-yellow-800 mb-2 font-medium bg-yellow-100/50 inline-block px-4 py-1 rounded-full border border-yellow-300">Umur: ${studentUmur} tahun | Negeri: ${studentNegeri}</p>
+                                </div>
+                                <div class="absolute inset-x-10 bottom-0 border-b-2 border-dashed border-yellow-600 opacity-50"></div>
+                            </div>
+                            
+                            <div class="px-8 mb-8 text-center max-w-2xl mx-auto">
+                                <p class="text-lg md:text-xl text-yellow-800 mb-2 italic">telah berjaya melengkapkan</p>
+                                <h3 class="text-2xl md:text-3xl font-bold text-yellow-900 mb-4">PROGRAM ASAS IQRA' 1 (FATHAH)</h3>
+                                
+                                <div class="flex flex-col items-center justify-center my-6">
+                                    <div class="bg-gradient-to-br from-green-500 to-green-700 rounded-full w-28 h-28 md:w-36 md:h-36 flex items-center justify-center border-4 border-yellow-400 shadow-xl relative">
+                                        <div class="absolute inset-1 rounded-full border border-yellow-200/50 border-dashed"></div>
+                                        <div class="text-center text-white">
+                                            <div class="text-3xl md:text-4xl font-black">${markah}</div>
+                                            <div class="text-[10px] md:text-xs font-bold uppercase">Markah</div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 bg-yellow-600 text-white px-4 py-1 rounded shadow text-sm md:text-base font-bold">${gelaran.title}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-end mt-12 px-8 mb-4">
+                                <div class="text-left">
+                                    <div class="border-b-2 border-yellow-800 w-32 md:w-48 mb-2 border-dashed"></div>
+                                    <p class="text-sm md:text-base font-bold text-yellow-900">${currentDate}</p>
+                                    <p class="text-xs md:text-sm text-yellow-700">Tarikh Penganugerahan</p>
+                                </div>
+                                
+                                <div class="text-center absolute bottom-8 left-1/2 transform -translate-x-1/2">
+                                    <div class="text-4xl text-yellow-500 opacity-30 mb-1">✧ 🌙 ✧</div>
+                                </div>
+                                
+                                <div class="text-right">
+                                    <div class="border-b-2 border-yellow-800 w-32 md:w-48 mb-2 border-dashed flex justify-end">
+                                        <span class="text-yellow-800 italic" style="font-family: 'Brush Script MT', cursive; font-size: 24px; line-height: 10px;">Fatha-X</span>
+                                    </div>
+                                    <p class="text-sm md:text-base font-bold text-yellow-900">Sistem Automasi Fatha-X</p>
+                                    <p class="text-xs md:text-sm text-yellow-700">Platform Pembelajaran Digital</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 mt-2 mb-6 italic">*Sila skrol ke kiri/kanan untuk melihat sijil penuh.</p>
+
+                    <div class="flex flex-col sm:flex-row gap-3 w-full max-w-md mx-auto">
+                        <button onclick="downloadCertificate()" 
+                                class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg text-base md:text-lg font-bold shadow-md transition-all">
+                            📸 Simpan Sijil
+                        </button>
+                        <button onclick="showFinalAssessmentResults()" 
+                                class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg text-base md:text-lg font-bold shadow-md transition-all">
+                            ← Kembali
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function downloadCertificate() {
+            showIslamicFeedback('Sila "Screenshot" paparan sijil ini untuk menyimpannya ke peranti anda! 📱', 'bg-blue-500');
+            
+            if (typeof html2canvas !== 'undefined') {
+                const certificateElement = document.getElementById('certificateContainer');
+                html2canvas(certificateElement, { scale: 2 }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `Sijil_${studentNama.replace(/\s+/g, '_')}_FathaX.png`;
+                    link.href = canvas.toDataURL("image/png");
+                    link.click();
+                }).catch(err => {
+                    console.log("Auto-download failed, rely on screenshot instructions.");
+                });
+            } else {
+                setTimeout(() => {
+                    showIslamicFeedback('Pegang butang Power + Volume Bawah untuk telefon pintar. 📸', 'bg-green-500');
+                }, 2500);
+            }
+        }
+        
+        function updateProgress(percentage) {
+            // Maintained for compatibility
+        }
+        
+        function updateActivityProgress(current, total) {
+            const percentage = Math.round((current / total) * 100);
+            const progressBar = document.getElementById('activityProgress');
+            const progressText = document.getElementById('activityProgressText');
+            
+            if (progressBar && progressText) {
+                progressBar.style.width = percentage + '%';
+                progressText.textContent = `Kemajuan: ${percentage}%`;
+            }
+        }
+        
+        function markActivityCompleted(activityId) {
+            if (!phaseProgress[currentPhase].completed.includes(activityId)) {
+                phaseProgress[currentPhase].completed.push(activityId);
+                showIslamicFeedback(`Aktiviti selesai! ✅`, 'bg-green-500');
+                localStorage.setItem('fathax_progress', JSON.stringify(phaseProgress));
+            }
+        }
+        
+        function loadProgress() {
+            const saved = localStorage.getItem('fathax_progress');
+            if (saved) {
+                try {
+                    phaseProgress = JSON.parse(saved);
+                } catch (e) {
+                    console.log('Error loading progress:', e);
+                }
+            }
+        }
+        
+        function buildMainMenu() {
+            const phaseGrid = document.getElementById('phaseGrid');
+            const phases = [
+                { id: 1, title: 'FASA 1', desc: 'Huruf Tunggal', subdesc: '(28 huruf)', icon: '📕', delay: '0s', color: '#C8E6C9' },
+                { id: 2, title: 'FASA 2', desc: 'Gabungan 2 Huruf', subdesc: 'Tunggal', icon: '📗', delay: '0.5s', color: '#BBDEFB' },
+                { id: 3, title: 'FASA 3', desc: 'Gabungan 3 Huruf', subdesc: 'Tunggal', icon: '📘', delay: '1s', color: '#FFE0B2' },
+                { id: 4, title: 'FASA 4', desc: 'Ulangkaji', subdesc: 'Interaktif', icon: '📙', delay: '1.5s', color: '#F8BBD0' }
+            ];
+            
+            phaseGrid.innerHTML = phases.map(phase => {
+                const isUnlocked = isPhaseUnlocked(phase.id);
+                const lockIcon = !isUnlocked ? '🔒' : '';
+                const bgColor = isUnlocked ? phase.color : '#EEEEEE';
+                const textColor = isUnlocked ? '#333333' : '#888888';
+                const clickHandler = isUnlocked ? `showPhase(${phase.id})` : `showPhaseLockedMessage(${phase.id})`;
+                const cursorClass = isUnlocked ? 'cursor-pointer hover:scale-105 hover:shadow-xl' : 'cursor-not-allowed opacity-70';
+                const overlay = !isUnlocked ? '<div class="absolute inset-0 bg-black/5 rounded-xl"></div>' : '';
+                
+                return `
+                    <div class="rounded-xl p-6 md:p-8 shadow-md transition-all transform relative ${cursorClass} border border-gray-200" 
+                         style="background: ${bgColor}; color: ${textColor};" 
+                         onclick="playSound('click'); ${clickHandler}">
+                        <div class="text-center">
+                            <div class="text-4xl md:text-5xl mb-4 md:mb-6 floating" style="animation-delay: ${phase.delay};">${phase.icon}</div>
+                            <h3 class="text-xl md:text-2xl font-bold mb-2">${phase.title} ${lockIcon}</h3>
+                            <p class="text-base md:text-lg font-semibold mb-1">${phase.desc}</p>
+                            <p class="text-xs md:text-sm opacity-80 mb-4">${phase.subdesc}</p>
+                            <div class="mt-2 md:mt-4">
+                                ${getPhaseStars(phase.id)}
+                            </div>
+                        </div>
+                        ${overlay}
+                    </div>
+                `;
+            }).join('');
+            
+            const finalAssessmentSection = document.getElementById('finalAssessmentSection');
+            const isFinalUnlocked = isFinalAssessmentUnlocked();
+            const finalBgColor = isFinalUnlocked ? '#FFF9C4' : '#EEEEEE';
+            const finalTextColor = isFinalUnlocked ? '#333333' : '#888888';
+            const finalLockIcon = !isFinalUnlocked ? '🔒' : '';
+            const finalCursorClass = isFinalUnlocked ? 'cursor-pointer hover:shadow-xl hover:scale-105' : 'cursor-not-allowed opacity-70';
+            const finalClickHandler = isFinalUnlocked ? 'showFinalAssessment()' : 'showFinalAssessmentLockedMessage()';
+            const finalOverlay = !isFinalUnlocked ? '<div class="absolute inset-0 bg-black/5 rounded-2xl"></div>' : '';
+            
+            finalAssessmentSection.innerHTML = `
+                <div class="p-6 md:p-8 text-center rounded-2xl shadow-md transition-all transform relative ${finalCursorClass} border border-gray-200 w-full" 
+                     style="background: ${finalBgColor}; color: ${finalTextColor};" 
+                     onclick="playSound('click'); ${finalClickHandler}">
+                    <div class="text-5xl md:text-6xl mb-4 md:mb-6 floating">🏆</div>
+                    <h3 class="text-2xl md:text-3xl font-bold mb-2 md:mb-4">Penilaian Akhir ${finalLockIcon}</h3>
+                    <p class="text-base md:text-xl mb-4">Ujian akhir - 20 soalan</p>
+                    <div class="text-progress-yellow text-lg md:text-2xl">
+                        <span>✨ ✨ ✨ ✨ ✨</span>
+                    </div>
+                    ${finalOverlay}
+                </div>
+            `;
+        }
+
+        // Check if html2canvas is loaded for downloading certificate
+        window.addEventListener('load', function() {
+            if (typeof html2canvas === 'undefined') {
+                const script = document.createElement('script');
+                script.src = "https://html2canvas.hertzen.com/dist/html2canvas.min.js";
+                document.head.appendChild(script);
+            }
+        });
+
+        // Initialize the app
+        document.getElementById('frontPage').classList.remove('hidden');
+    </script>
+</body>
+</html>
+
