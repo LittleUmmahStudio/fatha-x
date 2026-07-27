@@ -1,7 +1,7 @@
 const CACHE_NAME = 'fathax-cache-v1';
 const urlsToCache = [
-  './',
-  './index.html'
+  '/fatha-x/',
+  '/fatha-x/index.html'
 ];
 
 self.addEventListener('install', event => {
