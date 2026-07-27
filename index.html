@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FF6B6B">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎓 Fatha-X: Eksplorasi Huruf & Bunyi Fathah</title>
@@ -2986,6 +2988,15 @@
         // Initialize the app
         document.getElementById('frontPage').classList.remove('hidden');
     </script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('PWA aktif!', reg))
+        .catch(err => console.log('PWA gagal:', err));
+    });
+  }
+</script>
 </body>
 </html>
 
